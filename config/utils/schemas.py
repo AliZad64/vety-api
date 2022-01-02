@@ -1,8 +1,12 @@
 from ninja import Schema
+from pydantic import UUID4
 
 
 class MessageOut(Schema):
     message: str = None
+
+class Entity(Schema):
+    id: UUID4
 
 
 class Token(Schema):

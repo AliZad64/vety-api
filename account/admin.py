@@ -6,4 +6,4 @@ from account.models import EmailAccount
 # Register your models here.
 
 
-admin.register(EmailAccount,UserAdmin)
+admin.site.register(EmailAccount)

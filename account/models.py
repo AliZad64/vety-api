@@ -15,7 +15,7 @@ class EmailAccountManager(UserManager):
         case_insensitive_username_field = '{}__iexact'.format(self.model.USERNAME_FIELD)
         return self.get(**{case_insensitive_username_field: username})
 
-    def create_user(self, first_name, last_name, email, password=None):
+    def create_user(self, first_name, last_name, email, password=None, phone_number= None):
         if not email:
             raise ValueError('user must have email')
 
@@ -25,6 +25,8 @@ class EmailAccountManager(UserManager):
         user.set_password(password)
         user.first_name = first_name
         user.last_name = last_name
+        if phone_number:
+            user.phone_number = phone_number
         user.save(using=self._db)
         return user
 
@@ -44,7 +46,7 @@ class EmailAccount(AbstractUser, Entity):
     clinic = "clinic"
     username = models.NOT_PROVIDED
     email = models.EmailField(_('email address'), unique=True)
-    phone_number = models.CharField(_('phone number'),max_length=15, unique=True, null= True , blank = True, validators= [RegexValidator(r'^([\s\d]+)$', 'Only digits characters')])
+    phone_number = models.CharField('phone',max_length=15, unique=True, null= True , blank = True, validators= [RegexValidator(r'^([\s\d]+)$', 'Only digits characters')])
     city = models.ForeignKey('City', related_name='fromCity', on_delete=models.SET_NULL, null = True , blank = True)
     area = models.CharField('area',max_length=255, null = True , blank=True)
     account_type = models.CharField('type', max_length=255, choices=[
