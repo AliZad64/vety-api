@@ -13,7 +13,8 @@ User = get_user_model()
 class Member(models.Model):
     male = "male"
     female = "female"
-    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="memberss")
     gender = models.CharField('gender', max_length=255, null = True, blank=True, choices=[
         (male, male),
         (female, female),
@@ -21,7 +22,8 @@ class Member(models.Model):
     birth = models.DateField('birth', null=True , blank=True)
 
 class Clinic(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name= "clinicss")
     facebook = models.URLField('facebook', max_length=500, null=True, blank=True)
     instagram = models.URLField('instagram', max_length=500, null=True, blank=True)
     work_range = models.CharField('work_range',max_length=255, null= True , blank=True)

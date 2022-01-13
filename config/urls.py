@@ -4,7 +4,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 from account.controllers.user_controller import account_controller
-from vety.controllers.blog_controller import blog_controller
+
 from ninja import NinjaAPI
 api = NinjaAPI(
     version='1.0.0',
@@ -12,7 +12,7 @@ api = NinjaAPI(
     description='API documentation',
 )
 api.add_router('auth', account_controller)
-api.add_router('blog', blog_controller)
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', api.urls)
