@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model, authenticate
+from django.contrib.auth.hashers import check_password
 from django.shortcuts import get_object_or_404
 from config.utils.permissions import create_token, AuthBearer
 from config.utils.schemas import MessageOut
@@ -66,7 +67,7 @@ def signup(request, account_in: SignUpIn):
             'token': token,
         }
 
-    return 400, {'detail': 'User already registered!'}
+    return 400, {'message': 'User already registered!'}
 
 
 @account_controller.post('signin', response={
@@ -75,22 +76,24 @@ def signup(request, account_in: SignUpIn):
 })
 def signin(request, signin_in: SigninIn):
     user = authenticate(email=signin_in.email, password=signin_in.password)
-
     if not user:
-        return 404, {'detail': 'User does not exist'}
-    if user.account_type == "member":
-        user_type = get_object_or_404(Member, user = user)
-    token = create_token(user_type.user)
+        if  not signin_in.phone_number:
+            return 404, {'detail': 'User does not exist'}
+        user = get_object_or_404(User, email = signin_in.email)
+        if not check_password(signin_in.password,user.password):
+            return 404, {'message': 'wrong password'}
+    token = create_token(user)
 
     return {
-        'profile': user_type,
+        'profile': user,
         'token': token,
     }
 
 
-@account_controller.get('', auth=AuthBearer(), response=MemberOut)
+@account_controller.get('', auth=AuthBearer(), response=SignInOut)
 def me(request):
-    return get_object_or_404(Member, user=request.auth['pk'])
+    print(request.auth['pk'])
+    return get_object_or_404(User, id=request.auth['pk'])
 
 
 @account_controller.put('', auth=AuthBearer(), response={
