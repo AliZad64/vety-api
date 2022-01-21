@@ -1,42 +1,18 @@
 from django.contrib.auth import get_user_model, authenticate
 from django.contrib.auth.hashers import check_password
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
 from django.shortcuts import get_object_or_404
 from config.utils.permissions import create_token, AuthBearer
 from config.utils.schemas import MessageOut
 from django.db.models import Q
-from ninja import Router
+from ninja import Router, Form
 from account.schemas.user_schema import *
 from vety.models import Member
 account_controller = Router(tags=["auth"])
 
 User = get_user_model()
 
-#unrelated (just for testing)
-@account_controller.post('testsignup', response={
-    400: MessageOut,
-    201: MemberOut,
-})
-def testsignup(request, account_in: SignUpIn):
-    if account_in.password1 != account_in.password2:
-        return 400, {'detail': 'Passwords do not match!'}
-
-    try:
-        User.objects.get(Q(email=account_in.email) | Q(phone_number = account_in.phone_number))
-    except User.DoesNotExist:
-        new_user = User.objects.create_user(
-            first_name=account_in.first_name,
-            last_name=account_in.last_name,
-            phone_number = account_in.phone_number,
-            email=account_in.email,
-            password=account_in.password1
-        )
-
-        member = Member.objects.create(user = new_user, gender = "male")
-    return 400, {'detail': 'User already registered!'}
-
-@account_controller.get('loginTEST',  response={ 400: MessageOut ,200:SignInOut})
-def meTest(request, email: str):
-    return get_object_or_404(User, email= email)
 
 #related to the project
 @account_controller.post('signup', response={
@@ -47,6 +23,13 @@ def signup(request, account_in: SignUpIn):
     if account_in.password1 != account_in.password2:
         return 400, {'detail': 'Passwords do not match!'}
 
+    #validate email
+    if account_in.email:
+        try:
+            validate_email(account_in.email)
+        except ValidationError:
+            return 400, {'message': 'invalid email'}
+
     try:
         User.objects.get(Q(email=account_in.email) | Q(phone_number = account_in.phone_number))
     except User.DoesNotExist:
@@ -59,11 +42,11 @@ def signup(request, account_in: SignUpIn):
         )
 
         member = Member.objects.create(user = new_user, gender = "male")
-        token = create_token(member.user)
+        token = create_token(new_user)
 
         print(member)
         return 201, {
-            'profile': member,
+            'profile': new_user,
             'token': token,
         }
 
@@ -73,38 +56,49 @@ def signup(request, account_in: SignUpIn):
 @account_controller.post('signin', response={
     200: MemberOut,
     404: MessageOut,
+    400: MessageOut,
 })
 def signin(request, signin_in: SigninIn):
-    user = authenticate(email=signin_in.email, password=signin_in.password)
+    #sign in by phone number
+    user = authenticate(phone_number=signin_in.phone_number, password=signin_in.password)
     if not user:
-        if  not signin_in.phone_number:
-            return 404, {'detail': 'User does not exist'}
+        if  not signin_in.email:
+            return 404, {'message': 'User does not exist'}
+
+        #validate email
+        try:
+            validate_email(signin_in.email)
+        except ValidationError:
+            return 400, {'message': 'invalid email'}
+
+        #sign in by email
         user = get_object_or_404(User, email = signin_in.email)
         if not check_password(signin_in.password,user.password):
             return 404, {'message': 'wrong password'}
     token = create_token(user)
+    if user.account_type == "member":
+        return {
+            'profile': user,
+            'token': token,
+        }
+ 
 
-    return {
-        'profile': user,
-        'token': token,
-    }
 
-
-@account_controller.get('', auth=AuthBearer(), response=SignInOut)
+@account_controller.get('', auth=AuthBearer(), response=SignInOutMember)
 def me(request):
     print(request.auth['pk'])
     return get_object_or_404(User, id=request.auth['pk'])
 
 
 @account_controller.put('', auth=AuthBearer(), response={
-    200: MemberOut,
+    200: MemberUpdateOut,
 
 })
 def update_account(request, update_in: MemberUpdateIn):
     User.objects.filter(id=request.auth['pk']).update(**update_in.user.dict())
     Member.objects.filter(user=request.auth['pk']).update(**update_in.member.dict())
     #.update(gender = update_in.gender)
-    return get_object_or_404(Member, user=request.auth['pk'])
+    return get_object_or_404(User, id=request.auth['pk'])
 
 
 # @account_controller.post('change-password', auth=AuthBearer(), response={

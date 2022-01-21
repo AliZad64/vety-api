@@ -15,24 +15,24 @@ class EmailAccountManager(UserManager):
         case_insensitive_username_field = '{}__iexact'.format(self.model.USERNAME_FIELD)
         return self.get(**{case_insensitive_username_field: username})
 
-    def create_user(self, first_name, last_name, email, password=None, phone_number= None):
-        if not email:
-            raise ValueError('user must have email')
+    def create_user(self, first_name, last_name,phone_number, email = None, password=None):
+        if not phone_number:
+            raise ValueError('user must have phone_number')
 
         user = self.model(
-            email=self.normalize_email(email),
+            phone_number=phone_number,
         )
         user.set_password(password)
         user.first_name = first_name
         user.last_name = last_name
-        if phone_number:
-            user.phone_number = phone_number
+        if email:
+            user.email = self.normalize_email(email)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, password):
+    def create_superuser(self, phone_number, password):
         user = self.model(
-            email=self.normalize_email(email),
+            phone_number=phone_number,
         )
         user.set_password(password)
         user.is_staff = True
@@ -45,8 +45,8 @@ class EmailAccount(AbstractUser, Entity):
     member = "member"
     clinic = "clinic"
     username = models.NOT_PROVIDED
-    email = models.EmailField(_('email address'), unique=True)
-    phone_number = models.CharField('phone',max_length=15, unique=True, null= True , blank = True, validators= [RegexValidator(r'^([\s\d]+)$', 'Only digits characters')])
+    email = models.EmailField(_('email address'), unique=True, null= True)
+    phone_number = models.CharField(_('phone'),max_length=15, unique=True, null= True , blank = True, validators= [RegexValidator(r'^([\s\d]+)$', 'Only digits characters')])
     city = models.ForeignKey('City', related_name='fromCity', on_delete=models.SET_NULL, null = True , blank = True)
     area = models.CharField('area',max_length=255, null = True , blank=True)
     account_type = models.CharField('type', max_length=255, choices=[
@@ -59,12 +59,12 @@ class EmailAccount(AbstractUser, Entity):
 
     is_verified = models.BooleanField(default=False)
 
-    USERNAME_FIELD = 'email'
+    USERNAME_FIELD = 'phone_number'
     REQUIRED_FIELDS = []
     objects = EmailAccountManager()
 
     def __str__(self):
-        return self.email
+        return self.phone_number
 
     def has_perm(self, perm, obj=None):
         return self.is_superuser
