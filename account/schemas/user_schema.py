@@ -54,12 +54,16 @@ class SigninOut(SignUpOut):
 #---------user CLININC account--------
 
 class ClinicSchema(Schema):
+    id: UUID4
     facebook: str
     instagram: str
     work_range: str
 
 class SignOutClinic(SigninOut):
     clinic: ClinicSchema = Field(None, alias= 'clinicss')
+
+class ClinicInfo(ClinicSchema):
+    user: SigninOut
 
 class ClinicOut(Schema):
     profile: SignOutClinic

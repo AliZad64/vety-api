@@ -3,8 +3,8 @@ from django.conf.urls.static import static
 
 from django.contrib import admin
 from django.urls import path, include
-from account.controllers.user_controller import account_controller
-
+from account.controllers.user_controller import account_controller, clinic_controller
+from vety.controllers.pet_controller import pet_controller
 from ninja import NinjaAPI
 api = NinjaAPI(
     version='1.0.0',
@@ -12,6 +12,8 @@ api = NinjaAPI(
     description='API documentation',
 )
 api.add_router('auth', account_controller)
+api.add_router('clinic', clinic_controller)
+api.add_router('pet', pet_controller)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
