@@ -74,3 +74,6 @@ class EmailAccount(AbstractUser, Entity):
 
 class City(Entity):
     name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name

@@ -1,6 +1,8 @@
 import uuid
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.validators import RegexValidator
 
 from config.utils.models import Entity
 
@@ -62,4 +64,60 @@ class Pet(Entity):
     clinic_id = models.ManyToManyField(Clinic , related_name='pet_clinic')
     def __str__(self):
         return self.name
+class Blog(Entity):
+    title = models.CharField('title', max_length=255)
+    description = models.TextField('description')
+    image = models.ImageField('image', null=True , blank=True)
+    owner = models.ForeignKey(Clinic, related_name='clinics', on_delete=models.SET_NULL, blank=True, null=True)
+    type = models.ForeignKey(PetType, on_delete=models.SET_NULL, blank=True, null=True)
+
+class RateBlog(Entity):
+    blog_id = models.ForeignKey('blog',on_delete=models.CASCADE)
+    member_id = models.ForeignKey('member', on_delete=models.CASCADE)
+    is_like = models.BooleanField()
+    is_dislike = models.BooleanField()
+
+class RateClinic(Entity):
+    one = 1
+    two = 2
+    three = 3
+    four = 4
+    five = 5
+    clinic = models.ForeignKey('clinic', on_delete= models.CASCADE)
+    member = models.ForeignKey('member', on_delete=models.CASCADE)
+    point = models.IntegerField('point', choices=[
+        (one,one),
+        (two,two),
+        (three,three),
+        (four,four),
+        (five,five),
+    ], validators=[
+            MaxValueValidator(5),
+            MinValueValidator(1)
+        ])
+
+class Vaccine(Entity):
+    name = models.CharField('name', max_length=255)
+    company = models.CharField('company', max_length=255)
+    next = models.DateField('next', null=True, blank=True)
+    pet = models.ForeignKey(Pet, on_delete=models.CASCADE)
+    clinic = models.ForeignKey(Clinic, on_delete=models.CASCADE)
+
+class Report(Entity):
+    title = models.CharField('title', max_length=255)
+    allergy = models.CharField('allergy', max_length=255)
+    description = models.CharField('description', max_length=255)
+    pet = models.ForeignKey(Pet, on_delete=models.CASCADE)
+    clinic = models.ForeignKey(Clinic, on_delete=models.CASCADE)
+
+class Doctor(Entity):
+    name = models.CharField('name', max_length=255)
+    phone_number = models.CharField('phone_number', max_length=255, validators= [RegexValidator(r'^([\s\d]+)$', 'Only digits characters')])
+    clinic = models.ForeignKey(Clinic,on_delete=models.CASCADE)
+
+class Appointment(Entity):
+    clinic = models.ForeignKey(Clinic, on_delete=models.SET_NULL, blank=True , null=True)
+    member = models.ForeignKey(Member, on_delete=models.SET_NULL, blank=True , null=True)
+    date = models.DateField('date')
+
 
