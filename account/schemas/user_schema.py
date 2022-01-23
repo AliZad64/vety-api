@@ -1,7 +1,7 @@
 import re
 from turtle import st
 from typing import List
-from datetime import date
+from datetime import date, time
 from ninja.orm import create_schema
 from pydantic import Field, BaseModel, ValidationError, validator
 from ninja.files import UploadedFile
@@ -65,13 +65,7 @@ class SigninIn(Schema, BaseModel):
             if len(v) != 11:
                 raise ValueError('number length is 11')
         return v
-    def email_validation(cls,v):
-        if v:
-            try:
-                validate_email(v)
-            except ValidationError:
-                raise ValueError("invalid email")
-        return v
+
 
 
 class SigninOut(SignUpOut):
@@ -82,7 +76,8 @@ class ClinicSchema(Entity):
     user: SigninOut
     facebook: str
     instagram: str
-    work_range: str
+    start_date: time = None
+    end_date: time = None
 
 
 class ClinicInfo(ClinicSchema):

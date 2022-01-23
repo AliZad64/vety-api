@@ -50,7 +50,6 @@ class EmailAccount(AbstractUser, Entity):
     email = models.EmailField(_('email address'), unique=True, null= True)
     phone_number = models.CharField(max_length=15, unique=True, validators= [RegexValidator(r'^([\s\d]+)$', 'Only digits characters')])
     address = models.ForeignKey('Address', related_name='Addresss', on_delete=models.SET_NULL, null = True , blank = True)
-    area = models.CharField('area',max_length=255, null = True , blank=True)
     account_type = models.CharField('type', max_length=255, choices=[
         (member, member),
         (clinic, clinic),

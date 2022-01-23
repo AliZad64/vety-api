@@ -8,7 +8,7 @@ from config.utils.schemas import MessageOut
 from django.db.models import Q
 from ninja import Router, Form
 from account.schemas.old_user_schema import *
-from vety.models import Member, Clinic, PetType, Pet
+from vety.models import Member, Clinic, PetType, Pet, Blog
 from vety.schemas.pet_schema import *
 from vety.schemas.blog_schema import *
 
@@ -22,3 +22,27 @@ blog_controller = Router(tags=["blogs"])
 })
 def create_blog(request, payload:BlogIn):
     user = get_object_or_404(Clinic, user_id = request.auth['pk'])
+    type = get_object_or_404(PetType, id = payload.type_id)
+    blog = Blog.objects.create(title= payload.title , description=payload.description, image=payload.image,
+                               type= type, owner= user)
+    if blog:
+        return 201 , BlogOut
+    return 400, {"message": "bad request"}
+
+@blog_controller.get("all_blog", response=List[BlogOut])
+def all_blog(request):
+    return Blog.objects.all()
+
+@blog_controller.get("one_blog", response=BlogOut)
+def one_blog(request, id:UUID4):
+    return get_object_or_404(Blog, id = id)
+
+@blog_controller.delete("delete_blog", auth=AuthBearer(), response= {
+    200: MessageOut,
+    400: MessageOut
+})
+def delete_blog(request, id: UUID4):
+    user = get_object_or_404(Clinic, user_id = request.auth['pk'])
+    blog = get_object_or_404(Blog, id=id ,owner_id = user.id, )
+    blog.delete()
+    return 200, {"message": "deleted successfully"}

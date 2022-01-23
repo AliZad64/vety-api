@@ -64,7 +64,7 @@ def update_pet(request, payload: PetUpdate):
 def post_clinic_pet(request, id: UUID4, clinic_id: UUID4):
     try:
         pets = get_object_or_404(Pet,id = id , owner__user_id = request.auth['pk'])
-        pet = Pet.objects.get(id = id, owner__user_id= request.auth['pk'], clinic_id= clinic_id)
+        pet = Pet.objects.get(id = id, owner__user_id= request.auth['pk'], clinic= clinic_id)
     except Pet.DoesNotExist:
         clinic = get_object_or_404(Clinic,id = clinic_id)
         pets.clinic.add(clinic)

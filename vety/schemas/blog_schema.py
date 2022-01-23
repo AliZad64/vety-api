@@ -24,6 +24,12 @@ class BlogSchema(Schema):
 class BlogIn(BlogSchema):
     type_id: UUID4
 
-class BlogOut(BlogSchema):
+class BlogOut(Entity):
     owner: testClinicOut
-    type_id: PetTypeSchema
+    type: PetTypeSchema
+
+class BlogUpdate(BlogSchema):
+    title: str = None
+    description :str = None
+    image: str = None
+    type_id: UUID4 = None

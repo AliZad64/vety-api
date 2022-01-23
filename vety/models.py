@@ -31,7 +31,8 @@ class Clinic(models.Model):
     clinic_name = models.CharField('name',max_length=255,unique=True)
     facebook = models.URLField('facebook', max_length=500, null=True, blank=True)
     instagram = models.URLField('instagram', max_length=500, null=True, blank=True)
-    work_range = models.CharField('work_range',max_length=255, null= True , blank=True)
+    start_date = models.TimeField()
+    end_date = models.TimeField()
 
     def __str__(self):
         return self.clinic_name
@@ -58,7 +59,7 @@ class PetType(Entity):
 class Pet(Entity):
     name = models.CharField('name', max_length=255)
     owner = models.ForeignKey(Member, on_delete=models.CASCADE, related_name= "pet_owner")
-    image = models.ImageField('image', blank=True , null=True)
+    image = models.ImageField('image', blank=True , null=True, upload_to="pets/")
     type = models.ForeignKey(PetType, on_delete=models.CASCADE, related_name="pet_type")
     family = models.CharField('family', max_length=255, blank=True , null= True)
     weight = models.IntegerField('weight', blank=True , null=True)
@@ -126,7 +127,7 @@ class Doctor(Entity):
 class Appointment(Entity):
     clinic = models.ForeignKey(Clinic, on_delete=models.SET_NULL, blank=True , null=True)
     member = models.ForeignKey(Member, on_delete=models.SET_NULL, blank=True , null=True)
-    start_date = models.TimeField()
-    end_date = models.TimeField()
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField()
 
 
