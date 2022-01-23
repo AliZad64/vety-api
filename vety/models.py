@@ -28,10 +28,13 @@ class Member(models.Model):
 class Clinic(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name= "clinicss")
+    clinic_name = models.CharField('name',max_length=255,unique=True)
     facebook = models.URLField('facebook', max_length=500, null=True, blank=True)
     instagram = models.URLField('instagram', max_length=500, null=True, blank=True)
     work_range = models.CharField('work_range',max_length=255, null= True , blank=True)
-    
+
+    def __str__(self):
+        return self.clinic_name
 
 #---------blog model---------
 
@@ -56,12 +59,13 @@ class Pet(Entity):
     name = models.CharField('name', max_length=255)
     owner = models.ForeignKey(Member, on_delete=models.CASCADE, related_name= "pet_owner")
     image = models.ImageField('image', blank=True , null=True)
-    type_id = models.ForeignKey(PetType, on_delete=models.CASCADE, related_name="pet_type")
+    type = models.ForeignKey(PetType, on_delete=models.CASCADE, related_name="pet_type")
     family = models.CharField('family', max_length=255, blank=True , null= True)
     weight = models.IntegerField('weight', blank=True , null=True)
-    birth = models.DateField('birth', blank=True, null=True)
+    adopt_date = models.DateField('birth', blank=True, null=True)
     age = models.IntegerField('age', blank=True , null=True)
     clinic = models.ManyToManyField(Clinic , related_name='pet_clinic')
+
     def __str__(self):
         return self.name
 
@@ -78,8 +82,8 @@ class RateClinic(Entity):
     three = 3
     four = 4
     five = 5
-    clinic = models.ForeignKey('clinic', on_delete= models.CASCADE)
-    member = models.ForeignKey('member', on_delete=models.CASCADE)
+    clinic = models.ForeignKey(Clinic, on_delete= models.CASCADE)
+    member = models.ForeignKey(Member, on_delete=models.CASCADE)
     point = models.IntegerField('point', choices=[
         (one,one),
         (two,two),
@@ -98,6 +102,9 @@ class Vaccine(Entity):
     pet = models.ForeignKey(Pet, on_delete=models.CASCADE)
     clinic = models.ForeignKey(Clinic, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return self.name
+
 class Report(Entity):
     title = models.CharField('title', max_length=255)
     allergy = models.CharField('allergy', max_length=255)
@@ -105,14 +112,21 @@ class Report(Entity):
     pet = models.ForeignKey(Pet, on_delete=models.CASCADE)
     clinic = models.ForeignKey(Clinic, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return self.title
+
 class Doctor(Entity):
     name = models.CharField('name', max_length=255)
     phone_number = models.CharField('phone_number', max_length=255, validators= [RegexValidator(r'^([\s\d]+)$', 'Only digits characters')])
     clinic = models.ForeignKey(Clinic,on_delete=models.CASCADE)
 
+    def __str__(self):
+        return self.name
+
 class Appointment(Entity):
     clinic = models.ForeignKey(Clinic, on_delete=models.SET_NULL, blank=True , null=True)
     member = models.ForeignKey(Member, on_delete=models.SET_NULL, blank=True , null=True)
-    date = models.DateField('date')
+    start_date = models.TimeField()
+    end_date = models.TimeField()
 
 

@@ -35,23 +35,28 @@ class PetSchema(Schema):
     image: str = None
     family: str = None
     weight: int = None
-    birth: date = None
+    adopt_date: date = None
     age: int = None
 
 
 class SinglePet(PetSchema, Entity):
-    type_id: PetTypeSchema
+    type: PetTypeSchema
     clinic: List[testClinicOut]
 
 class PetOut(SinglePet):
     owner: testMemberOut
     clinic: List[testClinicOut]
 
-class PetIn(PetSchema):
-    pass
+class PetIn(Schema):
+    pet_info: PetSchema
+    type: UUID4 = None
+
+class PetUpdate(PetIn):
+    pet_id: UUID4
 #this is for user output
 class PetUserOut(PetSchema,Entity):
     pass
 class PetInClinic(Schema):
-    clinic_id: UUID4
+    pet: UUID4
+    clinic: UUID4
 

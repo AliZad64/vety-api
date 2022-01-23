@@ -1,16 +1,18 @@
 from django.contrib.auth import get_user_model, authenticate
 from django.contrib.auth.hashers import check_password
 from django.core.exceptions import ValidationError
-from django.core.validators import validate_email
 from django.shortcuts import get_object_or_404
 from config.utils.permissions import create_token, AuthBearer
 from config.utils.schemas import MessageOut
 from django.db.models import Q
 from ninja import Router, Form
-from account.schemas.old_user_schema import *
+from account.schemas.user_schema import *
 from vety.models import Member, Clinic
+from account.models import Address
+from django.core.validators import validate_email
 
 account_controller = Router(tags=["auth"])
+address_controller = Router(tags=["address"])
 clinic_controller = Router(tags=["clinic"])
 
 User = get_user_model()
@@ -43,24 +45,23 @@ def signup(request, account_in: SignUpIn):
             password=account_in.password1
         )
 
-        member = Member.objects.create(user=new_user, gender="male")
-        token = create_token(new_user)
-
+        member = Member.objects.create(user=new_user)
         print(member)
+        token = create_token(member.user)
         return 201, {
-            'profile': new_user,
+            'profile': member,
             'token': token,
         }
 
     return 400, {'message': 'User already registered!'}
 
 
-@account_controller.post('signin', response={
+@account_controller.post('sign_in', response={
     200: MemberOut,
     404: MessageOut,
     400: MessageOut,
 })
-def signin(request, signin_in: SigninIn):
+def sign_in(request, signin_in: SigninIn):
     # sign in by phone number
     user = authenticate(phone_number=signin_in.phone_number, password=signin_in.password)
     if not user:
@@ -70,7 +71,7 @@ def signin(request, signin_in: SigninIn):
         # validate email
         try:
             validate_email(signin_in.email)
-        except ValidationError:
+        except ValidationError as e:
             return 400, {'message': 'invalid email'}
 
         # sign in by email
@@ -78,20 +79,20 @@ def signin(request, signin_in: SigninIn):
         if not check_password(signin_in.password, user.password):
             return 404, {'message': 'wrong password'}
     token = create_token(user)
-    if user.account_type == "member":
-        return {
-            'profile': user,
-            'token': token,
-        }
+
+    return {
+        'profile': get_object_or_404(Member,user_id = user.id),
+        'token': token,
+    }
 
 
-@account_controller.get('', auth=AuthBearer(), response=SignInOutMember)
+@account_controller.get('', auth=AuthBearer(), response=MemberSchema)
 def me(request):
-    print(request.auth['pk'])
-    return get_object_or_404(User, id=request.auth['pk'])
+
+    return get_object_or_404(Member, user_id=request.auth['pk'])
 
 
-@account_controller.put('', auth=AuthBearer(), response={
+@account_controller.put('update_account', auth=AuthBearer(), response={
     200: MemberUpdateOut,
 
 })
@@ -99,15 +100,15 @@ def update_account(request, update_in: MemberUpdateIn):
     User.objects.filter(id=request.auth['pk']).update(**update_in.user.dict())
     Member.objects.filter(user=request.auth['pk']).update(**update_in.member.dict())
     # .update(gender = update_in.gender)
-    return get_object_or_404(User, id=request.auth['pk'])
+    return get_object_or_404(Member, user_id=request.auth['pk'])
 
 
-@clinic_controller.post('ClinicSignin', response={
+@clinic_controller.post('Clinic_Sign_in', response={
     200: ClinicOut,
     404: MessageOut,
     400: MessageOut,
 })
-def clinicsignin(request, signin_in: SigninIn):
+def clinic_sign_in(request, signin_in: SigninIn):
     # sign in by phone number
     user = authenticate(phone_number=signin_in.phone_number, password=signin_in.password)
     if not user:
@@ -127,7 +128,7 @@ def clinicsignin(request, signin_in: SigninIn):
     token = create_token(user)
     if user.account_type == "clinic":
         return {
-            'profile': user,
+            'profile': get_object_or_404(Clinic, user = user),
             'token': token,
         }
 
@@ -144,6 +145,16 @@ def all_clinic(request):
 })
 def one_clinic(request, id: UUID4):
     return get_object_or_404(Clinic, id= id)
+
+
+
+@address_controller.get('all_address',response={
+    200: List[AddressOut]
+})
+def all_address(request):
+    return Address.objects.all()
+
+
 # @account_controller.post('change-password', auth=AuthBearer(), response={
 #     200: MessageOut,
 #     400: MessageOut

@@ -1,14 +1,16 @@
 from django.db import models
-
+import re
 # Create your models here.
 from django.contrib.auth.models import UserManager, AbstractUser
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import authenticate
 from config.utils.models import Entity
-from django.core.validators import RegexValidator
+from django.core.validators import RegexValidator, ValidationError
 
-
+def number_valid(val):
+    if re.match(r'^([\s\d]+)$',val):
+        raise  ValidationError('only digit numbers')
 
 class EmailAccountManager(UserManager):
     def get_by_natural_key(self, username):
@@ -46,8 +48,8 @@ class EmailAccount(AbstractUser, Entity):
     clinic = "clinic"
     username = models.NOT_PROVIDED
     email = models.EmailField(_('email address'), unique=True, null= True)
-    phone_number = models.CharField(_('phone'),max_length=15, unique=True, null= True , blank = True, validators= [RegexValidator(r'^07([\s\d]+)$', 'Only digits characters')])
-    city = models.ForeignKey('City', related_name='fromCity', on_delete=models.SET_NULL, null = True , blank = True)
+    phone_number = models.CharField(max_length=15, unique=True, validators= [RegexValidator(r'^([\s\d]+)$', 'Only digits characters')])
+    address = models.ForeignKey('Address', related_name='Addresss', on_delete=models.SET_NULL, null = True , blank = True)
     area = models.CharField('area',max_length=255, null = True , blank=True)
     account_type = models.CharField('type', max_length=255, choices=[
         (member, member),
@@ -64,7 +66,7 @@ class EmailAccount(AbstractUser, Entity):
     objects = EmailAccountManager()
 
     def __str__(self):
-        return self.first_name + self.last_name
+        return self.phone_number
 
     def has_perm(self, perm, obj=None):
         return self.is_superuser

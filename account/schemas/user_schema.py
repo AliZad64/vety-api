@@ -1,10 +1,11 @@
+import re
 from turtle import st
 from typing import List
 from datetime import date
 from ninja.orm import create_schema
-from pydantic import Field
+from pydantic import Field, BaseModel, ValidationError, validator
 from ninja.files import UploadedFile
-
+from django.core.validators import validate_email
 from ninja import  Schema , File
 from ninja.orm import create_schema
 from pydantic import UUID4
@@ -14,20 +15,24 @@ from config.utils.schemas import Token
 from account.models import EmailAccount
 from vety.models import Member, Pet
 
-#----- for pet schema-----
+
 
 # ----------city schema---------
-class CityOut(Entity):
+class CityOut(Schema):
     name: str = None
-
+class ZoneOut(Schema):
+    name: str = None
+class AddressOut(Entity):
+    city: CityOut
+    zone: ZoneOut = None
 #------user sign up schema----------
 class SignUp(Schema):
     first_name: str
     last_name: str
     email: str = None
-    password1: str
-    password2: str
-    phone_number: str
+    password1: str = Field(min_length=8)
+    password2: str = Field(min_length=8)
+    phone_number: str = Field(min_length=11, max_length=15 , regex=r'^07([\s\d]+)$')
 
 class SignUpIn(SignUp):
     pass
@@ -37,7 +42,7 @@ class SignUpOut(Entity):
     last_name: str
     email: EmailStr = None
     phone_number: str
-    city: CityOut = None
+    address: AddressOut = None
     area: str = None
     account_type: str
     user_image: str = None
@@ -47,10 +52,27 @@ class SignUpOut(Entity):
 
 #------user signin-----
 
-class SigninIn(Schema):
+class SigninIn(Schema, BaseModel):
     email: str = None
-    phone_number: str = None
-    password: str
+    phone_number: str = Field(None, max_length=15)
+    password: str = Field(min_length=8)
+
+    @validator('phone_number')
+    def mini_length(cls,v):
+        if v:
+            if not re.search(r'^07([\s\d]+)$', v):
+                raise ValueError('must be digits only and start with 07')
+            if len(v) != 11:
+                raise ValueError('number length is 11')
+        return v
+    def email_validation(cls,v):
+        if v:
+            try:
+                validate_email(v)
+            except ValidationError:
+                raise ValueError("invalid email")
+        return v
+
 
 class SigninOut(SignUpOut):
     pass
@@ -95,11 +117,18 @@ class MemberOut(Schema):
 class UserUpdate(Schema):
     first_name: str = None
     last_name: str = None
-    area: str = None
+    address: UUID4 = None
     user_image: str = None
-class MemberUpdate(MemberSchema):
-    pass
+class MemberUpdate(Schema):
+    gender: str = None
+    birth: date = None
 
+    @validator('gender')
+    def right_gender(cls,v):
+        if v:
+            if v != "male" or v != "female":
+                raise ValueError("choose the right gender")
+        return v
 class MemberUpdateIn(Schema):
     user: UserUpdate = None
     member: MemberUpdate = None
