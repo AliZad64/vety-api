@@ -1,4 +1,4 @@
-from account.schemas.user_schema import *
+from account.schemas.old_user_schema import *
 from pydantic import UUID4
 from typing import List
 from datetime import date

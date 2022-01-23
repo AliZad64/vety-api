@@ -61,19 +61,14 @@ class Pet(Entity):
     weight = models.IntegerField('weight', blank=True , null=True)
     birth = models.DateField('birth', blank=True, null=True)
     age = models.IntegerField('age', blank=True , null=True)
-    clinic_id = models.ManyToManyField(Clinic , related_name='pet_clinic')
+    clinic = models.ManyToManyField(Clinic , related_name='pet_clinic')
     def __str__(self):
         return self.name
-class Blog(Entity):
-    title = models.CharField('title', max_length=255)
-    description = models.TextField('description')
-    image = models.ImageField('image', null=True , blank=True)
-    owner = models.ForeignKey(Clinic, related_name='clinics', on_delete=models.SET_NULL, blank=True, null=True)
-    type = models.ForeignKey(PetType, on_delete=models.SET_NULL, blank=True, null=True)
+
 
 class RateBlog(Entity):
-    blog_id = models.ForeignKey('blog',on_delete=models.CASCADE)
-    member_id = models.ForeignKey('member', on_delete=models.CASCADE)
+    blog = models.ForeignKey('blog',on_delete=models.CASCADE)
+    member = models.ForeignKey('member', on_delete=models.CASCADE)
     is_like = models.BooleanField()
     is_dislike = models.BooleanField()
 

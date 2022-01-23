@@ -56,18 +56,20 @@ class SigninOut(SignUpOut):
     pass
 #---------user CLININC account--------
 
-class ClinicSchema(Entity):
-    user: SigninOut
+class ClinicSchema(Schema):
+    id: UUID4
     facebook: str
     instagram: str
     work_range: str
 
+class SignOutClinic(SigninOut):
+    clinic: ClinicSchema = Field(None, alias= 'clinicss')
 
 class ClinicInfo(ClinicSchema):
     user: SigninOut
 
 class ClinicOut(Schema):
-    profile: ClinicSchema
+    profile: SignOutClinic
     token: Token
 
 #------- user MEMBER account------
@@ -81,13 +83,15 @@ class PetUserOut(Entity):
     clinic: List[ClinicInfo] = Field(None, alias= 'pet_clinic')
 
 class MemberSchema(Schema):
-    user: SigninOut
     gender:str = None
     birth: date = None
     pet: List[PetUserOut] = Field(None, alias= "owner_pet")
 
+class SignInOutMember(SigninOut):
+    member: MemberSchema = Field(None, alias= 'memberss')
+
 class MemberOut(Schema):
-    profile: MemberSchema
+    profile: SignInOutMember
     token: Token
 
 
@@ -104,7 +108,7 @@ class MemberUpdateIn(Schema):
     user: UserUpdate = None
     member: MemberUpdate = None
 
-class MemberUpdateOut(MemberSchema):
+class MemberUpdateOut(SignInOutMember):
     pass
 
 

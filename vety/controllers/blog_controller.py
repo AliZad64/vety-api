@@ -7,7 +7,7 @@ from config.utils.permissions import create_token, AuthBearer
 from config.utils.schemas import MessageOut
 from django.db.models import Q
 from ninja import Router, Form
-from account.schemas.user_schema import *
+from account.schemas.old_user_schema import *
 from vety.models import Member, Clinic, PetType, Pet
 from vety.schemas.pet_schema import *
 from vety.schemas.blog_schema import *

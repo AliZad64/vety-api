@@ -46,7 +46,7 @@ class EmailAccount(AbstractUser, Entity):
     clinic = "clinic"
     username = models.NOT_PROVIDED
     email = models.EmailField(_('email address'), unique=True, null= True)
-    phone_number = models.CharField(_('phone'),max_length=15, unique=True, null= True , blank = True, validators= [RegexValidator(r'^([\s\d]+)$', 'Only digits characters')])
+    phone_number = models.CharField(_('phone'),max_length=15, unique=True, null= True , blank = True, validators= [RegexValidator(r'^07([\s\d]+)$', 'Only digits characters')])
     city = models.ForeignKey('City', related_name='fromCity', on_delete=models.SET_NULL, null = True , blank = True)
     area = models.CharField('area',max_length=255, null = True , blank=True)
     account_type = models.CharField('type', max_length=255, choices=[
@@ -77,3 +77,16 @@ class City(Entity):
 
     def __str__(self):
         return self.name
+
+class Zone(Entity):
+    name = models.CharField(max_length=255)
+    city = models.ForeignKey(City, on_delete=models.SET_NULL, blank=True , null= True)
+    def __str__(self):
+        return self.name
+
+class Address(Entity):
+    city = models.ForeignKey(City, on_delete=models.CASCADE)
+    zone = models.ForeignKey(Zone, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.city.name + " - " + self.zone.name
