@@ -9,7 +9,7 @@ from ninja import Router, Form
 from account.schemas.user_schema import *
 from vety.models import Member, Clinic
 from account.models import Address
-from django.core.validators import validate_email
+from email_validator import validate_email, EmailNotValidError
 
 account_controller = Router(tags=["auth"])
 address_controller = Router(tags=["address"])
@@ -31,6 +31,8 @@ def signup(request, account_in: SignUpIn):
     if account_in.email:
         try:
             validate_email(account_in.email)
+        except EmailNotValidError:
+            return 400, {'message': 'invalid email'}
         except ValidationError:
             return 400, {'message': 'invalid email'}
 
@@ -46,7 +48,6 @@ def signup(request, account_in: SignUpIn):
         )
 
         member = Member.objects.create(user=new_user)
-        print(member)
         token = create_token(member.user)
         return 201, {
             'profile': member,
@@ -71,6 +72,8 @@ def sign_in(request, signin_in: SigninIn):
         # validate email
         try:
             validate_email(signin_in.email)
+        except EmailNotValidError:
+            return 400, {'message': 'invalid email'}
         except ValidationError as e:
             return 400, {'message': 'invalid email'}
 
