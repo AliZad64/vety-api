@@ -24,7 +24,7 @@ class BlogSchema(Schema):
 class BlogIn(BlogSchema):
     type_id: UUID4
 
-class BlogOut(Entity):
+class BlogOut(Entity, BlogSchema):
     owner: testClinicOut
     type: PetTypeSchema
 

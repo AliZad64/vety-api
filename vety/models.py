@@ -42,7 +42,7 @@ class Clinic(models.Model):
 class Blog(Entity):
     title = models.CharField('title', max_length=255)
     description = models.TextField('description')
-    image = models.CharField('image', max_length=255,blank=True, null=True)
+    image = models.ImageField('image', upload_to = "blogs/", null = True , blank = True)
     owner = models.ForeignKey(Clinic, related_name="fromClinic", on_delete=models.CASCADE)
     type = models.ForeignKey('PetType', related_name= "fromPet", null = True , blank = True, on_delete= models.SET_NULL)
 
@@ -83,7 +83,7 @@ class RateClinic(Entity):
     three = 3
     four = 4
     five = 5
-    clinic = models.ForeignKey(Clinic, on_delete= models.CASCADE)
+    blog = models.ForeignKey(Blog, on_delete= models.CASCADE)
     member = models.ForeignKey(Member, on_delete=models.CASCADE)
     point = models.IntegerField('point', choices=[
         (one,one),

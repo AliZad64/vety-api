@@ -110,6 +110,7 @@ def update_account(request, update_in: MemberUpdateIn):
     200: ClinicOut,
     404: MessageOut,
     400: MessageOut,
+    403:MessageOut,
 })
 def clinic_sign_in(request, signin_in: SigninIn):
     # sign in by phone number
@@ -121,6 +122,8 @@ def clinic_sign_in(request, signin_in: SigninIn):
         # validate email
         try:
             validate_email(signin_in.email)
+        except EmailNotValidError:
+            return 400, {'message': 'invalid email'}
         except ValidationError:
             return 400, {'message': 'invalid email'}
 
@@ -134,6 +137,7 @@ def clinic_sign_in(request, signin_in: SigninIn):
             'profile': get_object_or_404(Clinic, user = user),
             'token': token,
         }
+    return 403, {"message": "invalid clinic account"}
 
 
 @clinic_controller.get('all_clinics', response={
