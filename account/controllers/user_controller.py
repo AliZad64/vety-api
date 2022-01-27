@@ -64,21 +64,20 @@ def signup(request, account_in: SignUpIn):
 })
 def sign_in(request, signin_in: SigninIn):
     # sign in by phone number
-    user = authenticate(phone_number=signin_in.phone_number, password=signin_in.password)
+    if not signin_in.user:
+        return 404, {'message': 'enter number or email'}
+    user = authenticate(phone_number=signin_in.user, password=signin_in.password)
     if not user:
-        if not signin_in.email:
-            return 404, {'message': 'User does not exist'}
-
         # validate email
         try:
-            validate_email(signin_in.email)
+            validate_email(signin_in.user)
         except EmailNotValidError:
-            return 400, {'message': 'invalid email'}
+            return 400, {'message': 'user does not exist'}
         except ValidationError as e:
-            return 400, {'message': 'invalid email'}
+            return 400, {'message': 'user does not exist'}
 
         # sign in by email
-        user = get_object_or_404(User, email=signin_in.email)
+        user = get_object_or_404(User, email=signin_in.user)
         if not check_password(signin_in.password, user.password):
             return 404, {'message': 'wrong password'}
     token = create_token(user)
@@ -114,21 +113,21 @@ def update_account(request, update_in: MemberUpdateIn):
 })
 def clinic_sign_in(request, signin_in: SigninIn):
     # sign in by phone number
-    user = authenticate(phone_number=signin_in.phone_number, password=signin_in.password)
-    if not user:
-        if not signin_in.email:
-            return 404, {'message': 'User does not exist'}
+    if not signin_in.user:
+        return 404, {'message': 'User does not exist'}
 
+    user = authenticate(phone_number=signin_in.user, password=signin_in.password)
+    if not user:
         # validate email
         try:
-            validate_email(signin_in.email)
+            validate_email(signin_in.user)
         except EmailNotValidError:
             return 400, {'message': 'invalid email'}
         except ValidationError:
             return 400, {'message': 'invalid email'}
 
         # sign in by email
-        user = get_object_or_404(User, email=signin_in.email)
+        user = get_object_or_404(User, email=signin_in.user)
         if not check_password(signin_in.password, user.password):
             return 404, {'message': 'wrong password'}
     token = create_token(user)
@@ -141,14 +140,14 @@ def clinic_sign_in(request, signin_in: SigninIn):
 
 
 @clinic_controller.get('all_clinics', response={
-    200: List[ClinicInfo]
+    200: List[ClinicSchema]
 })
 def all_clinic(request):
     return Clinic.objects.all()
 
 
 @clinic_controller.get('one_clinics', response={
-    200: ClinicInfo
+    200: ClinicSchema
 })
 def one_clinic(request, id: UUID4):
     return get_object_or_404(Clinic, id= id)

@@ -53,18 +53,9 @@ class SignUpOut(Entity):
 #------user signin-----
 
 class SigninIn(Schema, BaseModel):
-    email: str = None
-    phone_number: str = Field(None, max_length=15)
+    user: str
     password: str = Field(min_length=8)
 
-    @validator('phone_number')
-    def mini_length(cls,v):
-        if v:
-            if not re.search(r'^07([\s\d]+)$', v):
-                raise ValueError('must be digits only and start with 07')
-            if len(v) != 11:
-                raise ValueError('number length is 11')
-        return v
 
 
 
@@ -78,6 +69,7 @@ class ClinicSchema(Entity):
     instagram: str
     start_date: time = None
     end_date: time = None
+    rating_average: int = None
 
 
 class ClinicInfo(ClinicSchema):
@@ -101,7 +93,12 @@ class MemberSchema(Schema):
     user: SigninOut
     gender:str = None
     birth: date = None
-    pet: List[PetUserOut] = Field(None, alias= "owner_pet")
+    pet: List[PetUserOut] = Field(None, alias= "pet_owner")
+
+class MemberNoPetSchema(Schema):
+    user: SigninOut
+    gender:str = None
+    birth: date = None
 
 class MemberOut(Schema):
     profile: MemberSchema
@@ -121,7 +118,7 @@ class MemberUpdate(Schema):
     @validator('gender')
     def right_gender(cls,v):
         if v:
-            if v != "male" or v != "female":
+            if v  != "male" and v != "female":
                 raise ValueError("choose the right gender")
         return v
 class MemberUpdateIn(Schema):

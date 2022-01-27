@@ -1,4 +1,4 @@
-from account.schemas.old_user_schema import *
+from account.schemas.user_schema import *
 from pydantic import UUID4
 from typing import List
 from datetime import date
@@ -25,7 +25,7 @@ class BlogIn(BlogSchema):
     type_id: UUID4
 
 class BlogOut(Entity, BlogSchema):
-    owner: testClinicOut
+    owner: ClinicSchema
     type: PetTypeSchema
 
 class BlogUpdate(BlogSchema):
@@ -33,3 +33,6 @@ class BlogUpdate(BlogSchema):
     description :str = None
     image: str = None
     type_id: UUID4 = None
+
+class BlogSortById(Schema):
+    type: UUID4

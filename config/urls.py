@@ -6,6 +6,7 @@ from django.urls import path, include
 from account.controllers.user_controller import account_controller, clinic_controller, address_controller
 from vety.controllers.pet_controller import pet_controller
 from vety.controllers.blog_controller import blog_controller
+from vety.controllers.rateclinic_controller import clinic_rating_controller
 from ninja import NinjaAPI
 api = NinjaAPI(
     version='1.0.0',
@@ -17,7 +18,7 @@ api.add_router('address',address_controller)
 api.add_router('clinic', clinic_controller)
 api.add_router('pet', pet_controller)
 api.add_router('blog', blog_controller)
-
+api.add_router('clinic_rating', clinic_rating_controller)
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', api.urls)

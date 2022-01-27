@@ -1,4 +1,4 @@
-from account.schemas.old_user_schema import SignUpOut
+from account.schemas.user_schema import SignUpOut, ClinicSchema, MemberSchema
 from pydantic import UUID4
 from typing import List
 from datetime import date
@@ -14,8 +14,7 @@ from config.utils.schemas import Entity
 from config.utils.schemas import Token
 from account.models import EmailAccount
 from vety.models import Member
-
-
+#-----for testing and they are not used anymore
 class testMemberOut(Schema):
     user: SignUpOut
     gender:str = None
@@ -41,11 +40,11 @@ class PetSchema(Schema):
 
 class SinglePet(PetSchema, Entity):
     type: PetTypeSchema
-    clinic: List[testClinicOut]
+    clinic: List[ClinicSchema]
 
 class PetOut(SinglePet):
-    owner: testMemberOut
-    clinic: List[testClinicOut]
+    owner: MemberSchema
+    clinic: List[ClinicSchema]
 
 class PetIn(Schema):
     pet_info: PetSchema

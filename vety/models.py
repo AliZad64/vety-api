@@ -23,7 +23,7 @@ class Member(models.Model):
     ])
     birth = models.DateField('birth', null=True , blank=True)
     def __str__(self):
-        return self.id.phone_number
+        return self.user.phone_number
 
 class Clinic(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -33,6 +33,10 @@ class Clinic(models.Model):
     instagram = models.URLField('instagram', max_length=500, null=True, blank=True)
     start_date = models.TimeField()
     end_date = models.TimeField()
+
+    @property
+    def rating_average(self):
+        return self.clinicss_clinic_rating.aggregate(models.Avg('point')).get('point__avg')
 
     def __str__(self):
         return self.clinic_name
@@ -46,8 +50,10 @@ class Blog(Entity):
     owner = models.ForeignKey(Clinic, related_name="fromClinic", on_delete=models.CASCADE)
     type = models.ForeignKey('PetType', related_name= "fromPet", null = True , blank = True, on_delete= models.SET_NULL)
 
+
     def __str__(self):
         return self.title
+
 #-------pet related models--------
 class PetType(Entity):
     name = models.CharField('title', max_length=255)
@@ -71,11 +77,17 @@ class Pet(Entity):
         return self.name
 
 
-class RateBlog(Entity):
-    blog = models.ForeignKey('blog',on_delete=models.CASCADE)
-    member = models.ForeignKey('member', on_delete=models.CASCADE)
-    is_like = models.BooleanField()
-    is_dislike = models.BooleanField()
+class LikeBlog(Entity):
+    blog = models.ForeignKey('blog',on_delete=models.CASCADE, related_name="blogss_rating_like")
+    member = models.ForeignKey('member', on_delete=models.CASCADE, related_name="memberss_rating_like")
+    is_like = models.BooleanField(default=False)
+
+
+class DislikeBlog(Entity):
+    blog = models.ForeignKey('blog',on_delete=models.CASCADE, related_name="blogss_rating_dislike")
+    member = models.ForeignKey('member', on_delete=models.CASCADE, related_name="memberss_rating_dislike")
+    is_dislike = models.BooleanField(default=False)
+
 
 class RateClinic(Entity):
     one = 1
@@ -83,8 +95,8 @@ class RateClinic(Entity):
     three = 3
     four = 4
     five = 5
-    blog = models.ForeignKey(Blog, on_delete= models.CASCADE)
-    member = models.ForeignKey(Member, on_delete=models.CASCADE)
+    clinic = models.ForeignKey(Clinic, on_delete= models.CASCADE, related_name="clinicss_clinic_rating")
+    member = models.ForeignKey(Member, on_delete=models.CASCADE, related_name= "memberss_clinic_rating")
     point = models.IntegerField('point', choices=[
         (one,one),
         (two,two),

@@ -46,3 +46,7 @@ def delete_blog(request, id: UUID4):
     blog = get_object_or_404(Blog, id=id ,owner_id = user.id, )
     blog.delete()
     return 200, {"message": "deleted successfully"}
+
+@blog_controller.get("filter_by_type", response= List[BlogOut])
+def filter_by_type(request, id: UUID4):
+    return Blog.objects.filter(type = id)
