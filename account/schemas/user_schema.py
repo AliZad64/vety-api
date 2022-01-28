@@ -1,5 +1,5 @@
 import re
-from turtle import st
+
 from typing import List
 from datetime import date, time
 from ninja.orm import create_schema

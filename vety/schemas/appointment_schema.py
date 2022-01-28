@@ -20,7 +20,6 @@ class AppointmentSchema(Schema):
     end_date: datetime
 
 class AppointmentSchemaIn(AppointmentSchema):
-    member : UUID4
     clinic: UUID4
 
 class AppointmentSchemaOut(Entity, AppointmentSchema):
