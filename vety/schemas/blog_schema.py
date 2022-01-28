@@ -27,7 +27,8 @@ class BlogIn(BlogSchema):
 class BlogOut(Entity, BlogSchema):
     owner: ClinicSchema
     type: PetTypeSchema
-
+    like_count: int = None
+    dislike_count: int = None
 class BlogUpdate(BlogSchema):
     title: str = None
     description :str = None

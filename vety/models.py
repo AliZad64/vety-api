@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.core.validators import RegexValidator
-
+from django.db.models import Count
 from config.utils.models import Entity
 
 
@@ -50,6 +50,13 @@ class Blog(Entity):
     owner = models.ForeignKey(Clinic, related_name="fromClinic", on_delete=models.CASCADE)
     type = models.ForeignKey('PetType', related_name= "fromPet", null = True , blank = True, on_delete= models.SET_NULL)
 
+    @property
+    def like_count(self):
+        return self.blogss_rating_like.count()
+
+    @property
+    def dislike_count(self):
+        return self.blogss_rating_dislike.count()
 
     def __str__(self):
         return self.title

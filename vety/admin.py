@@ -12,6 +12,8 @@ admin.site.register(Appointment)
 admin.site.register(Doctor)
 admin.site.register(Vaccine)
 admin.site.register(Report)
+admin.site.register(LikeBlog)
+admin.site.register(DislikeBlog)
 
 
 
