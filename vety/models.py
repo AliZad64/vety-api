@@ -11,6 +11,7 @@ User = get_user_model()
 
 # Create your models here.
 
+
 # Member and Clinic type of models linked with the django user table
 class Member(models.Model):
     male = "male"
@@ -22,6 +23,11 @@ class Member(models.Model):
         (female, female),
     ])
     birth = models.DateField('birth', null=True , blank=True)
+
+    class Meta():
+        verbose_name_plural = "الاعضاء"
+        verbose_name = "عضو"
+
     def __str__(self):
         return self.user.phone_number
 
@@ -34,6 +40,9 @@ class Clinic(models.Model):
     start_date = models.TimeField()
     end_date = models.TimeField()
 
+    class Meta():
+        verbose_name_plural = "العيادات"
+        verbose_name = "العيادة"
     @property
     def rating_average(self):
         return self.clinicss_clinic_rating.aggregate(models.Avg('point')).get('point__avg')
@@ -50,6 +59,10 @@ class Blog(Entity):
     owner = models.ForeignKey(Clinic, related_name="fromClinic", on_delete=models.CASCADE)
     type = models.ForeignKey('PetType', related_name= "fromPet", null = True , blank = True, on_delete= models.SET_NULL)
 
+    class Meta():
+        verbose_name_plural = "المقالات"
+        verbose_name = "المقالة"
+
     @property
     def like_count(self):
         return self.blogss_rating_like.count()
@@ -64,6 +77,10 @@ class Blog(Entity):
 #-------pet related models--------
 class PetType(Entity):
     name = models.CharField('title', max_length=255)
+
+    class Meta():
+        verbose_name_plural = "انواع الحيوانات"
+        verbose_name = "نوع الحيوان"
 
     def __str__(self):
         return self.name
@@ -80,6 +97,10 @@ class Pet(Entity):
     age = models.IntegerField('age', blank=True , null=True)
     clinic = models.ManyToManyField(Clinic , related_name='pet_clinic')
 
+    class Meta():
+        verbose_name_plural = "حيوانات الاليفة"
+        verbose_name = "حيوان اليف"
+
     def __str__(self):
         return self.name
 
@@ -89,12 +110,18 @@ class LikeBlog(Entity):
     member = models.ForeignKey('member', on_delete=models.CASCADE, related_name="memberss_rating_like")
     is_like = models.BooleanField(default=False)
 
+    class Meta():
+        verbose_name_plural = "اعجاب المقالة"
+        verbose_name = "اعجاب المقالة"
 
 class DislikeBlog(Entity):
     blog = models.ForeignKey('blog',on_delete=models.CASCADE, related_name="blogss_rating_dislike")
     member = models.ForeignKey('member', on_delete=models.CASCADE, related_name="memberss_rating_dislike")
     is_dislike = models.BooleanField(default=False)
 
+    class Meta():
+        verbose_name_plural = "كره المقالة"
+        verbose_name = "كره المقالة"
 
 class RateClinic(Entity):
     one = 1
@@ -115,12 +142,22 @@ class RateClinic(Entity):
             MinValueValidator(1)
         ])
 
+    class Meta():
+        verbose_name_plural = "تقييمات"
+        verbose_name = "تقييم"
+
+
+
 class Vaccine(Entity):
     name = models.CharField('name', max_length=255)
     company = models.CharField('company', max_length=255)
     next = models.DateField('next', null=True, blank=True)
     pet = models.ForeignKey(Pet, on_delete=models.CASCADE)
     clinic = models.ForeignKey(Clinic, on_delete=models.CASCADE)
+
+    class Meta():
+        verbose_name_plural = "اللقاحات"
+        verbose_name = "اللقاح"
 
     def __str__(self):
         return self.name
@@ -132,6 +169,10 @@ class Report(Entity):
     pet = models.ForeignKey(Pet, on_delete=models.CASCADE)
     clinic = models.ForeignKey(Clinic, on_delete=models.CASCADE)
 
+    class Meta():
+        verbose_name_plural = "التقارير"
+        verbose_name = "تقرير"
+
     def __str__(self):
         return self.title
 
@@ -139,6 +180,10 @@ class Doctor(Entity):
     name = models.CharField('name', max_length=255)
     phone_number = models.CharField('phone_number', max_length=255, validators= [RegexValidator(r'^([\s\d]+)$', 'Only digits characters')])
     clinic = models.ForeignKey(Clinic,on_delete=models.CASCADE)
+
+    class Meta():
+        verbose_name_plural = "الاطباء"
+        verbose_name = "طبيب"
 
     def __str__(self):
         return self.name
@@ -149,4 +194,6 @@ class Appointment(Entity):
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
 
-
+    class Meta():
+        verbose_name_plural = "المستخدمون"
+        verbose_name = "المستخدم"

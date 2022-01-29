@@ -8,6 +8,7 @@ from vety.controllers.pet_controller import pet_controller
 from vety.controllers.blog_controller import blog_controller
 from vety.controllers.rateclinic_controller import clinic_rating_controller
 from vety.controllers.rateblog_controller import blog_rating_controller
+from vety.controllers.appointment_controller import appointment_controller
 from ninja import NinjaAPI
 api = NinjaAPI(
     version='1.0.0',
@@ -21,6 +22,7 @@ api.add_router('pet', pet_controller)
 api.add_router('blog', blog_controller)
 api.add_router('clinic_rating', clinic_rating_controller)
 api.add_router('blog_rating', blog_rating_controller)
+api.add_router('appointment', appointment_controller)
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', api.urls)

@@ -50,6 +50,7 @@ class SignUpOut(Entity):
 
 
 
+
 #------user signin-----
 
 class SigninIn(Schema, BaseModel):
@@ -87,7 +88,7 @@ class PetUserOut(Entity):
     weight: int = None
     birth: date = None
     age: int = None
-    clinic: List[ClinicInfo] = Field(None, alias= 'pet_clinic')
+    clinic: List[ClinicSchema] = Field(None, alias= "pet_clinic")
 
 class MemberSchema(Schema):
     user: SigninOut
@@ -128,4 +129,9 @@ class MemberUpdateIn(Schema):
 class MemberUpdateOut(MemberSchema):
     pass
 
+
+
+# test user schema
+class testUserSchemaOut(SignUpOut):
+    member: MemberSchema = Field(None, alias = "memberss")
 

@@ -64,8 +64,11 @@ class EmailAccount(AbstractUser, Entity):
     REQUIRED_FIELDS = []
     objects = EmailAccountManager()
 
+    class Meta():
+        verbose_name_plural = "المستخدمون"
+        verbose_name = "المستخدم"
     def __str__(self):
-        return self.first_name + self.last_name
+        return self.first_name + self.last_name + " - " + self.phone_number
 
     def has_perm(self, perm, obj=None):
         return self.is_superuser
@@ -76,18 +79,27 @@ class EmailAccount(AbstractUser, Entity):
 class City(Entity):
     name = models.CharField(max_length=255)
 
+    class Meta():
+        verbose_name_plural = "المدن"
+        verbose_name = "المدينة"
     def __str__(self):
         return self.name
 
 class Zone(Entity):
     name = models.CharField(max_length=255)
     city = models.ForeignKey(City, on_delete=models.SET_NULL, blank=True , null= True)
+
+    class Meta():
+        verbose_name_plural = "المناطق"
+        verbose_name = "المنطقة"
     def __str__(self):
         return self.name
 
 class Address(Entity):
     city = models.ForeignKey(City, on_delete=models.CASCADE)
     zone = models.ForeignKey(Zone, on_delete=models.CASCADE)
-
+    class Meta():
+        verbose_name_plural = "العناوين"
+        verbose_name = "العنوان"
     def __str__(self):
         return self.city.name + " - " + self.zone.name

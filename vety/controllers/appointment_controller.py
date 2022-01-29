@@ -18,4 +18,4 @@ appointment_controller = Router(tags=["appointment"])
     400: MessageOut
 })
 def create_appointment(request, payload:AppointmentSchemaIn):
-    pass
+    return {}

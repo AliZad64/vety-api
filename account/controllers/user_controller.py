@@ -88,10 +88,10 @@ def sign_in(request, signin_in: SigninIn):
     }
 
 
-@account_controller.get('', auth=AuthBearer(), response=MemberSchema)
+@account_controller.get('', auth=AuthBearer(), response=testUserSchemaOut)
 def me(request):
 
-    return get_object_or_404(Member, user_id=request.auth['pk'])
+    return get_object_or_404(User, id=request.auth['pk'])
 
 
 @account_controller.put('update_account', auth=AuthBearer(), response={
