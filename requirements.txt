@@ -3,6 +3,7 @@ cffi==1.15.0
 cryptography==36.0.1
 Django==4.0
 django-cors-headers==3.11.0
+django-jazzmin==2.4.9
 django-ninja==0.16.1
 dnspython==2.1.0
 ecdsa==0.17.0
