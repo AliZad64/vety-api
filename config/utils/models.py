@@ -115,5 +115,10 @@ class UUIDModel(BaseModel):
     class Meta:
         abstract = True
 
-
+class CustomDateTimeField(models.DateTimeField):
+    def value_to_string(self, obj):
+        val = self.value_from_object(obj)
+        if val:
+            return val.strftime("%Y-%m-%d %I%p")
+        return ''
 

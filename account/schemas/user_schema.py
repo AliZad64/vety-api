@@ -1,5 +1,5 @@
 import re
-
+from datetime import datetime
 from typing import List
 from datetime import date, time
 from ninja.orm import create_schema
@@ -63,9 +63,27 @@ class SigninIn(Schema, BaseModel):
 class SigninOut(SignUpOut):
     pass
 #---------user CLININC account--------
+#member less content for appointment clinic
+class MemberForClinic(Entity):
+    first_name: str
+    last_name: str
+    email: EmailStr = None
+    phone_number: str
+#doctor class
+class DoctorSchema(Entity):
+    name: str
+    phone_number: str
+#member class
+class MemberClinicSchema(Entity):
+    user: MemberForClinic
+#appointment class for clinic
+class AppointmentClinicSchema(Entity):
+    start_date: datetime
+    end_date: datetime
+    member: MemberClinicSchema
 
 class ClinicSchema(Entity):
-    user: SigninOut
+    clinic_name: str
     facebook: str
     instagram: str
     start_date: time = None
@@ -76,11 +94,20 @@ class ClinicSchema(Entity):
 class ClinicInfo(ClinicSchema):
     user: SigninOut
 
+class ClinicFullInfo(ClinicInfo):
+    appointment: List[AppointmentClinicSchema] = Field(None, alias= "clinicss_appointment")
+
 class ClinicOut(Schema):
-    profile: ClinicSchema
+    profile: ClinicInfo
     token: Token
 
 #------- user MEMBER account------
+#appointment schema for member
+class AppointmentMemberSchema(Entity):
+    start_date: datetime
+    end_date: datetime
+    clinic: ClinicSchema
+#pet schema for member
 class PetUserOut(Entity):
     name: str
     image: str = None
@@ -95,7 +122,12 @@ class MemberSchema(Schema):
     gender:str = None
     birth: date = None
     pet: List[PetUserOut] = Field(None, alias= "pet_owner")
+    appointment: List[AppointmentMemberSchema] = Field(None, alias= "memberss_appointment")
 
+class MemberSchema2(Schema):
+    gender:str = None
+    birth: date = None
+    pet: List[PetUserOut] = Field(None, alias= "pet_owner")
 class MemberNoPetSchema(Schema):
     user: SigninOut
     gender:str = None
@@ -130,8 +162,8 @@ class MemberUpdateOut(MemberSchema):
     pass
 
 
-
 # test user schema
 class testUserSchemaOut(SignUpOut):
-    member: MemberSchema = Field(None, alias = "memberss")
+    member: MemberSchema2 = Field(None, alias = "memberss")
+    appointment: List[AppointmentMemberSchema] = Field(None, alias= "memberss_appointment")
 

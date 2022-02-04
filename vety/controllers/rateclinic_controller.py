@@ -14,7 +14,7 @@ from vety.schemas.rateclinic_schema import *
 clinic_rating_controller = Router(tags=["clinic_rating"])
 
 @clinic_rating_controller.post('rate_clinic',auth=AuthBearer(), response= {
-    201: RateClinicSchemaOut,
+    201: MessageOut,
     400: MessageOut
 })
 def rate_clinic(request, payload:RateClinicSchemaIn):
@@ -27,10 +27,10 @@ def rate_clinic(request, payload:RateClinicSchemaIn):
         try:
             rating = RateClinic.objects.get(member= user, clinic = clinic)
             rating.objects.update(member = user, clinic= clinic,point = payload.point)
-            return rating
+            return 201, {"message": "updated your rating successfully"}
         except:
             rating = RateClinic.objects.create(member = user , clinic= clinic, point = payload.point)
-            return 201, rating
+            return 201, {"message": "your rating has been saved"}
 
 @clinic_rating_controller.get("one_clinic_rate",auth=AuthBearer(), response= {
     200: RateClinicSchemaOut

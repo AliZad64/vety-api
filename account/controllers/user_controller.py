@@ -147,7 +147,7 @@ def all_clinic(request):
 
 
 @clinic_controller.get('one_clinics', response={
-    200: ClinicSchema
+    200: ClinicFullInfo
 })
 def one_clinic(request, id: UUID4):
     return get_object_or_404(Clinic, id= id)

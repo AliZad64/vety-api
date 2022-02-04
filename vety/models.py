@@ -4,7 +4,7 @@ from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.core.validators import RegexValidator
 from django.db.models import Count
-from config.utils.models import Entity
+from config.utils.models import Entity, CustomDateTimeField
 
 
 User = get_user_model()
@@ -95,6 +95,7 @@ class Pet(Entity):
     weight = models.IntegerField('weight', blank=True , null=True)
     adopt_date = models.DateField('birth', blank=True, null=True)
     age = models.IntegerField('age', blank=True , null=True)
+    chip_num = models.CharField('chip_number', max_length=255, blank=True , null=True)
     clinic = models.ManyToManyField(Clinic , related_name='pet_clinic')
 
     class Meta():
@@ -189,11 +190,18 @@ class Doctor(Entity):
         return self.name
 
 class Appointment(Entity):
-    clinic = models.ForeignKey(Clinic, on_delete=models.SET_NULL, blank=True , null=True)
-    member = models.ForeignKey(Member, on_delete=models.SET_NULL, blank=True , null=True)
-    start_date = models.DateTimeField()
-    end_date = models.DateTimeField()
+    clinic = models.ForeignKey(Clinic, on_delete=models.SET_NULL, blank=True , null=True, related_name="clinicss_appointment")
+    member = models.ForeignKey(Member, on_delete=models.SET_NULL, blank=True , null=True, related_name="memberss_appointment")
+    start_date = CustomDateTimeField()
+    end_date = CustomDateTimeField()
 
     class Meta():
-        verbose_name_plural = "المستخدمون"
-        verbose_name = "المستخدم"
+        verbose_name_plural = "المواعيد"
+        verbose_name = "الموعد"
+
+
+class Contact(Entity):
+    first_name = models.CharField(max_length=255)
+    last_name = models.CharField(max_length=255)
+    email = models.EmailField('email address')
+    question = models.TextField()

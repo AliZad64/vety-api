@@ -32,7 +32,7 @@ def create_pet(request, payload:PetIn):
     return 400, {'message': 'bad request'}
 
 @pet_controller.get('all_pet', auth=AuthBearer(), response={
-    200: List[SinglePet],
+    200: List[PetNoClinic],
     404: MessageOut,
 })
 def all_pet(request):

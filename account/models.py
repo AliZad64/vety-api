@@ -7,6 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import authenticate
 from config.utils.models import Entity
 from django.core.validators import RegexValidator, ValidationError
+from django.db.models import CheckConstraint, Q, F
 
 def number_valid(val):
     if re.match(r'^([\s\d]+)$',val):
@@ -101,5 +102,6 @@ class Address(Entity):
     class Meta():
         verbose_name_plural = "العناوين"
         verbose_name = "العنوان"
+
     def __str__(self):
         return self.city.name + " - " + self.zone.name
