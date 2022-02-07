@@ -88,9 +88,9 @@ class PetType(Entity):
 
 class Pet(Entity):
     name = models.CharField('name', max_length=255)
-    owner = models.ForeignKey(Member, on_delete=models.CASCADE, related_name= "pet_owner")
+    owner = models.ForeignKey(Member, on_delete=models.SET_NULL, blank=True, null=True, related_name= "pet_owner")
     image = models.ImageField('image', blank=True , null=True, upload_to="pets/")
-    type = models.ForeignKey(PetType, on_delete=models.CASCADE, related_name="pet_type")
+    type = models.ForeignKey(PetType, on_delete=models.SET_NULL,blank=True, null=True, related_name="pet_type")
     family = models.CharField('family', max_length=255, blank=True , null= True)
     weight = models.IntegerField('weight', blank=True , null=True)
     adopt_date = models.DateField('birth', blank=True, null=True)
@@ -153,7 +153,7 @@ class Vaccine(Entity):
     name = models.CharField('name', max_length=255)
     company = models.CharField('company', max_length=255)
     next = models.DateField('next', null=True, blank=True)
-    pet = models.ForeignKey(Pet, on_delete=models.CASCADE)
+    pet = models.ForeignKey(Pet, on_delete=models.SET_NULL, blank=True , null=True)
     clinic = models.ForeignKey(Clinic, on_delete=models.CASCADE)
 
     class Meta():
@@ -167,7 +167,7 @@ class Report(Entity):
     title = models.CharField('title', max_length=255)
     allergy = models.CharField('allergy', max_length=255)
     description = models.CharField('description', max_length=255)
-    pet = models.ForeignKey(Pet, on_delete=models.CASCADE)
+    pet = models.ForeignKey(Pet, on_delete=models.SET_NULL, blank=True , null=True)
     clinic = models.ForeignKey(Clinic, on_delete=models.CASCADE)
 
     class Meta():
@@ -205,3 +205,7 @@ class Contact(Entity):
     last_name = models.CharField(max_length=255)
     email = models.EmailField('email address')
     question = models.TextField()
+
+    class Meta():
+        verbose_name_plural = "الرسائل"
+        verbose_name = "الرسالة"

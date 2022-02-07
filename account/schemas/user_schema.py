@@ -80,7 +80,7 @@ class MemberClinicSchema(Entity):
 class AppointmentClinicSchema(Entity):
     start_date: datetime
     end_date: datetime
-    member: MemberClinicSchema
+    member: MemberClinicSchema = None
 
 class ClinicSchema(Entity):
     clinic_name: str
@@ -103,19 +103,22 @@ class ClinicOut(Schema):
 
 #------- user MEMBER account------
 #appointment schema for member
+class MemberToClinicAppointmentSchema(Entity):
+    clinic_name: str
+
 class AppointmentMemberSchema(Entity):
     start_date: datetime
     end_date: datetime
-    clinic: ClinicSchema
+    clinic: MemberToClinicAppointmentSchema
 #pet schema for member
 class PetUserOut(Entity):
     name: str
     image: str = None
-    family: str = None
-    weight: int = None
-    birth: date = None
-    age: int = None
-    clinic: List[ClinicSchema] = Field(None, alias= "pet_clinic")
+#    family: str = None
+#    weight: int = None
+#    birth: date = None
+#    age: int = None
+#    clinic: List[ClinicSchema] = Field(None, alias= "pet_clinic")
 
 class MemberSchema(Schema):
     user: SigninOut

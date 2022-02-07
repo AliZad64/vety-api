@@ -36,11 +36,11 @@ def get_current_user(token: str):
     """ Check auth user
     """
     try:
-        print("test")
+
         payload = jwt.decode(token = token, key = settings.SECRET_KEY, algorithms=[ALGORITHM])
-        print(payload)
+
         token_data = TokenAuth(**payload)
-        print(token_data)
+
     except JWTError:
         return None
 
@@ -53,10 +53,8 @@ def get_current_user(token: str):
 
 class AuthBearer(HttpBearer):
     def authenticate(self, request, token: str) -> get_user_model:
-        print("bye")
-        print(token)
+
         user = get_current_user(token)
-        print(user.id)
-        print("hi")
+
         if user:
             return { 'pk': str(user.id)}

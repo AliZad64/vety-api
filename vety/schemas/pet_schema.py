@@ -45,8 +45,8 @@ class SinglePet(PetSchema, Entity):
 class PetOut(SinglePet):
     pass
 #this is for all pets endpoint so we don't show the clinics for each pet
-class PetNoClinic(PetSchema):
-    type: PetTypeSchema
+class PetNoClinic(PetSchema, Entity):
+    type: PetTypeSchema = None
 class PetIn(Schema):
     pet_info: PetSchema
     type: UUID4 = None

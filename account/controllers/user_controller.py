@@ -58,6 +58,7 @@ def signup(request, account_in: SignUpIn):
 
 
 @account_controller.post('sign_in', response={
+    201: ClinicOut,
     200: MemberOut,
     404: MessageOut,
     400: MessageOut,
@@ -81,17 +82,30 @@ def sign_in(request, signin_in: SigninIn):
         if not check_password(signin_in.password, user.password):
             return 404, {'message': 'wrong password'}
     token = create_token(user)
+    if user.account_type == "member":
+        return {
+            'profile': get_object_or_404(Member,user_id = user.id),
+            'token': token,
+        }
+    if user.account_type == "clinic":
+        return 201, {
+            'profile': get_object_or_404(Clinic, user_id=user.id),
+            'token': token,
+        }
 
-    return {
-        'profile': get_object_or_404(Member,user_id = user.id),
-        'token': token,
-    }
 
-
-@account_controller.get('', auth=AuthBearer(), response=testUserSchemaOut)
+@account_controller.get('me', auth=AuthBearer(), response={
+    200: MemberSchema,
+    201: ClinicFullInfo,
+})
 def me(request):
 
-    return get_object_or_404(User, id=request.auth['pk'])
+    user =  get_object_or_404(User, id=request.auth['pk'])
+    if user.account_type == "member":
+        return  get_object_or_404(Member,user = user)
+
+    if user.account_type == "clinic":
+        return 201, get_object_or_404(Clinic, user_id=user.id)
 
 
 @account_controller.put('update_account', auth=AuthBearer(), response={
@@ -104,7 +118,14 @@ def update_account(request, update_in: MemberUpdateIn):
     # .update(gender = update_in.gender)
     return get_object_or_404(Member, user_id=request.auth['pk'])
 
-
+@account_controller.delete("delete_account", auth=AuthBearer(),response= {
+    204: MessageOut,
+})
+def delete_account(request):
+    member = get_object_or_404(Member, user_id = request.auth['pk'])
+    user = User.objects.filter(id = request.auth['pk'])
+    user.delete()
+    return 200,{"message":"deleted"}
 @clinic_controller.post('Clinic_Sign_in', response={
     200: ClinicOut,
     404: MessageOut,
@@ -143,7 +164,7 @@ def clinic_sign_in(request, signin_in: SigninIn):
     200: List[ClinicSchema]
 })
 def all_clinic(request):
-    return Clinic.objects.all()
+    return Clinic.objects.all().exclude(clinic_name = "vety")
 
 
 @clinic_controller.get('one_clinics', response={

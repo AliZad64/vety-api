@@ -19,7 +19,9 @@ appointment_controller = Router(tags=["appointment"])
     400: MessageOut
 })
 def create_appointment(request, payload:AppointmentSchemaIn):
+    #get the date without seconds
     start_date = payload.start_date.strftime('%Y-%m-%d %H:%M')
+    #get the time only for validate
     start_time = payload.start_date.strftime("%H:%M")
     end_date = payload.start_date + timedelta(hours=1)
     end_time = end_date.strftime("%H:%M")
@@ -27,16 +29,22 @@ def create_appointment(request, payload:AppointmentSchemaIn):
     print(end_time)
     member = get_object_or_404(Member, user_id = request.auth['pk'])
     clinic = get_object_or_404(Clinic, id = payload.clinic)
+
+    #check if clinic is available at these times
     clinic_check = Clinic.objects.filter(start_date__lte = start_time , end_date__gte= end_time, id = payload.clinic)
     if not clinic_check:
         return 400 , {"message": "that time is not available for that clinic"}
-    clinic_date_check = Clinic.objects.filter(appointment__start_date__exact= start_date, id = payload.clinic)
+
+    #check if clinic is available at this date
+    clinic_date_check = Clinic.objects.filter(clinicss_appointment__start_date__exact= start_date, id = payload.clinic)
     if clinic_date_check:
         return 400, {"message": "this date is already booked"}
 
-    member_date_check = Member.objects.filter(user_id = request.auth['pk'], appointment__start_date__exact= start_date)
+    #check if member haven't booked an appointment at this date
+    member_date_check = Member.objects.filter(user_id = request.auth['pk'], memberss_appointment__start_date__exact= start_date)
     if member_date_check:
         return 400, {"message": "you already have booked at this date to a clinic"}
+
     x = Appointment.objects.create(clinic = clinic, member = member, start_date= start_date, end_date= end_date)
     if x:
         return 201, x
