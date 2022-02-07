@@ -126,7 +126,7 @@ def delete_account(request):
     user = User.objects.filter(id = request.auth['pk'])
     user.delete()
     return 200,{"message":"deleted"}
-@clinic_controller.post('Clinic_Sign_in', response={
+@clinic_controller.post('Clinic_Sign_in', deprecated = True, response={
     200: ClinicOut,
     404: MessageOut,
     400: MessageOut,

@@ -87,8 +87,14 @@ class PetType(Entity):
 
 
 class Pet(Entity):
+    male = "male"
+    female = "female"
     name = models.CharField('name', max_length=255)
     owner = models.ForeignKey(Member, on_delete=models.SET_NULL, blank=True, null=True, related_name= "pet_owner")
+    gender = models.CharField('gender', max_length=255, null = True, blank=True, choices=[
+        (male, male),
+        (female, female),
+    ])
     image = models.ImageField('image', blank=True , null=True, upload_to="pets/")
     type = models.ForeignKey(PetType, on_delete=models.SET_NULL,blank=True, null=True, related_name="pet_type")
     family = models.CharField('family', max_length=255, blank=True , null= True)

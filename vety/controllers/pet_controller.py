@@ -8,7 +8,7 @@ from config.utils.schemas import MessageOut
 from django.db.models import Q
 from ninja import Router, Form
 from account.schemas.old_user_schema import *
-from vety.models import Member, Clinic, PetType, Pet
+from vety.models import Member, Clinic, PetType, Pet, Vaccine, Report
 from vety.schemas.pet_schema import *
 pet_controller = Router(tags=['pet'])
 
@@ -36,16 +36,37 @@ def create_pet(request, payload:PetIn):
     404: MessageOut,
 })
 def all_pet(request):
-    return Pet.objects.filter(owner__user_id= request.auth['pk'])
-
+    user = get_object_or_404(User, id = request.auth['pk'])
+    if user.account_type == "member":
+        return Pet.objects.filter(owner__user_id= request.auth['pk'])
+    if user.account_type == "clinic":
+        return Pet.objects.filter(clinic__user_id= request.auth['pk'])
 
 @pet_controller.get('one_pet', auth = AuthBearer(), response= {
-    200: SinglePet,
+    200: PetOut,
     404: MessageOut,
 })
 def one_pet(request, id: UUID4):
-    return get_object_or_404(Pet, id = id, owner__user_id = request.auth['pk'])
-
+    pet = get_object_or_404(Pet, id = id, owner__user_id = request.auth['pk'])
+    user = get_object_or_404(User, id = request.auth['pk'])
+    if user.account_type == "member":
+        vaccine = Vaccine.objects.filter(pet_id = pet.id)
+        report = Report.objects.filter(pet_id = pet.id)
+        return {
+            "pet": pet,
+            "vaccine": vaccine,
+            "report": report
+        }
+    if user.account_type == "clinic":
+        clinic = get_object_or_404(Clinic, user_id = user.id)
+        pet = get_object_or_404(Pet, clinic_id = clinic.id)
+        vaccine = Vaccine.objects.filter(pet_id = pet.id, clinic_id= clinic.id)
+        report = Report.objects.filter(pet_id = pet.id , clinic_id= clinic.id)
+        return {
+            "pet": pet,
+            "vaccine": vaccine,
+            "report": report
+        }
 @pet_controller.put('update_pet', auth= AuthBearer(), response= {
     200: MessageOut,
     400: MessageOut
@@ -71,3 +92,12 @@ def post_clinic_pet(request, id: UUID4, clinic_id: UUID4):
         pets.clinic.add(clinic)
         return 201 , {'message': 'succeed'}
     return 400, {'message': 'bad request'}
+
+@pet_controller.delete("delete_pet", auth=AuthBearer(), response= {
+    200: MessageOut
+})
+def delete_pet(request, pet_id: UUID4):
+    member = get_object_or_404(Member,user_id = request.auth['pk'])
+    pet = get_object_or_404(Pet,owner__user_id = request.auth['pk'], id = pet_id)
+    pet.delete()
+    return {"message": "deleted successfully"}
