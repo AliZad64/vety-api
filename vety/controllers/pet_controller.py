@@ -45,28 +45,14 @@ def all_pet(request):
 @pet_controller.get('one_pet', auth = AuthBearer(), response= {
     200: PetOut,
     404: MessageOut,
+    403: MessageOut,
 })
 def one_pet(request, id: UUID4):
-    pet = get_object_or_404(Pet, id = id, owner__user_id = request.auth['pk'])
     user = get_object_or_404(User, id = request.auth['pk'])
     if user.account_type == "member":
-        vaccine = Vaccine.objects.filter(pet_id = pet.id)
-        report = Report.objects.filter(pet_id = pet.id)
-        return {
-            "pet": pet,
-            "vaccine": vaccine,
-            "report": report
-        }
-    if user.account_type == "clinic":
-        clinic = get_object_or_404(Clinic, user_id = user.id)
-        pet = get_object_or_404(Pet, clinic_id = clinic.id)
-        vaccine = Vaccine.objects.filter(pet_id = pet.id, clinic_id= clinic.id)
-        report = Report.objects.filter(pet_id = pet.id , clinic_id= clinic.id)
-        return {
-            "pet": pet,
-            "vaccine": vaccine,
-            "report": report
-        }
+        pet = get_object_or_404(Pet, id=id, owner__user_id=request.auth['pk'])
+        return pet
+    return 403 , {"message": "not authorized to use endpoint"}
 @pet_controller.put('update_pet', auth= AuthBearer(), response= {
     200: MessageOut,
     400: MessageOut

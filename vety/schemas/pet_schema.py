@@ -1,4 +1,4 @@
-from account.schemas.user_schema import SignUpOut, ClinicSchema, MemberSchema
+from account.schemas.user_schema import SignUpOut, ClinicSchema, MemberSchema, MemberForClinic , MemberClinicSchema
 from pydantic import UUID4
 from typing import List
 from datetime import date, datetime
@@ -7,13 +7,14 @@ from pydantic import Field
 from ninja.files import UploadedFile
 
 from ninja import  Schema , File
-from ninja.orm import create_schema
+
 
 from pydantic import EmailStr, validator
 from config.utils.schemas import Entity
 from config.utils.schemas import Token
 from account.models import EmailAccount
 from vety.models import Member
+
 #-----for testing and they are not used anymore
 class testMemberOut(Schema):
     user: SignUpOut
@@ -30,18 +31,39 @@ class testClinicOut(Schema):
 #for vaccine and report schemas
 class NameClinicSchema(Entity):
     clinic_name: str = None
-class VaccineSchema(Entity):
-    name: str
-    clinic: NameClinicSchema
+class VaccineSchema(Schema):
+    name: str = None
+    clinic: NameClinicSchema = None
     created: datetime = None
 
-
-class ReportSchema(Entity):
-    title: str
-    clinic: NameClinicSchema
+class ReportSchema(Schema):
+    id: UUID4 = None
+    title: str = None
+    clinic: NameClinicSchema = None
     description: str = None
     created: datetime = None
 
+#for clinic vaccine and clinic schema
+class PetSchemaForClinic(Entity):
+    owner: MemberClinicSchema
+class ClinicVaccineSchema(Schema):
+    id: UUID4 = None
+    name:str = None
+    pet: PetSchemaForClinic = None
+    created: datetime = None
+
+
+class ClinicReportSchema(Entity):
+    title:str
+    pet: PetSchemaForClinic
+    created: datetime = None
+
+class ClinicReportSchemaFinal(Entity):
+    report: ClinicReportSchema
+    user: MemberForClinic = None
+
+
+#normal pet schemas
 class PetTypeSchema(Entity):
     name: str
 
@@ -71,13 +93,19 @@ class SinglePet(PetSchema, Entity):
     type: PetTypeSchema
     clinic: List[ClinicSchema]
 
-class PetOut(Schema):
-    pet: SinglePet
-    vaccine: VaccineSchema
-    report: ReportSchema
+class PetOut(SinglePet):
+    vaccine: List[VaccineSchema] = Field(None, alias="petss_vaccine")
+    report: List[ReportSchema] = Field(None, alias="petss_report")
 #this is for all pets endpoint so we don't show the clinics for each pet
 class PetNoClinic(PetSchema, Entity):
     type: PetTypeSchema = None
+
+#this is for clinic
+class PetOutClinic(Schema):
+    pet: PetNoClinic
+    vaccine: List[ClinicVaccineSchema] = None
+    report: List[ClinicReportSchema] = None
+
 class PetIn(Schema):
     pet_info: PetSchema
     type: UUID4

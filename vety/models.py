@@ -159,8 +159,8 @@ class Vaccine(Entity):
     name = models.CharField('name', max_length=255)
     company = models.CharField('company', max_length=255)
     next = models.DateField('next', null=True, blank=True)
-    pet = models.ForeignKey(Pet, on_delete=models.SET_NULL, blank=True , null=True)
-    clinic = models.ForeignKey(Clinic, on_delete=models.CASCADE)
+    pet = models.ForeignKey(Pet, on_delete=models.SET_NULL, blank=True , null=True, related_name="petss_vaccine")
+    clinic = models.ForeignKey(Clinic, on_delete=models.CASCADE, related_name = "clinics_vaccine")
 
     class Meta():
         verbose_name_plural = "اللقاحات"
@@ -173,8 +173,8 @@ class Report(Entity):
     title = models.CharField('title', max_length=255)
     allergy = models.CharField('allergy', max_length=255)
     description = models.CharField('description', max_length=255)
-    pet = models.ForeignKey(Pet, on_delete=models.SET_NULL, blank=True , null=True)
-    clinic = models.ForeignKey(Clinic, on_delete=models.CASCADE)
+    pet = models.ForeignKey(Pet, on_delete=models.SET_NULL, blank=True , null=True, related_name="petss_report")
+    clinic = models.ForeignKey(Clinic, on_delete=models.CASCADE, related_name="clinicss_report")
 
     class Meta():
         verbose_name_plural = "التقارير"
