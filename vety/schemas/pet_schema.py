@@ -67,12 +67,13 @@ class PetTypeSchema(Entity):
 
 class PetSchema(Schema):
     name: str
-    gender: str = None
-    image: str = None
-    family: str = None
-    weight: int = None
-    adopt_date: date = None
-    age: int = None
+    gender: str
+    image: str
+    family: str
+    weight: int
+    adopt_date: date
+    age: int
+    chip_num: str = None
 
     @validator('gender')
     def right_gender(cls, v):
@@ -96,7 +97,7 @@ class PetOut(SinglePet):
     report: List[ReportSchema] = Field(None, alias="petss_report")
 #this is for all pets endpoint so we don't show the clinics for each pet
 class PetNoClinic(PetSchema, Entity):
-    type: PetTypeSchema = None
+    type: PetTypeSchema
 
 #this is for clinic
 class PetOutClinic(Schema):

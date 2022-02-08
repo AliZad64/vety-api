@@ -84,8 +84,8 @@ class AppointmentClinicSchema(Entity):
 
 class ClinicSchema(Entity):
     clinic_name: str
-    facebook: str
-    instagram: str
+    facebook: str = None
+    instagram: str = None
     start_date: time = None
     end_date: time = None
     rating_average: int = None
