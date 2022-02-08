@@ -19,8 +19,7 @@ class RateClinicSchema(Schema):
     point: int
 
 class RateClinicSchemaOut(RateClinicSchema, Entity):
-    clinic: ClinicSchema
-    member: MemberSchema
+    pass
 class RateClinicSchemaIn(RateClinicSchema):
     clinic: UUID4
 

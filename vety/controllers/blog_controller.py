@@ -33,6 +33,15 @@ def create_blog(request, payload:BlogIn):
 def all_blog(request):
     return Blog.objects.all()
 
+@blog_controller.get("filter_by_clinic", response= {
+    200: List[BlogOut],
+    404: MessageOut,
+})
+def filter_by_clinic(request, clinic_id: UUID4):
+    blog = Blog.objects.filter(clinic_id = clinic_id)
+    if blog:
+        return blog
+    return 404, {"messag": "clinic not found or clinic does not have blogs"}
 @blog_controller.get("one_blog", response=BlogOut)
 def one_blog(request, id:UUID4):
     return get_object_or_404(Blog, id = id)
