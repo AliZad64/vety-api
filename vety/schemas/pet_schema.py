@@ -49,13 +49,11 @@ class PetSchemaForClinic(Entity):
 class ClinicVaccineSchema(Schema):
     id: UUID4 = None
     name:str = None
-    pet: PetSchemaForClinic = None
     created: datetime = None
 
 
 class ClinicReportSchema(Entity):
     title:str
-    pet: PetSchemaForClinic
     created: datetime = None
 
 class ClinicReportSchemaFinal(Entity):

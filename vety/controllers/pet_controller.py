@@ -44,15 +44,39 @@ def all_pet(request):
 
 @pet_controller.get('one_pet', auth = AuthBearer(), response= {
     200: PetOut,
+    201: PetOutClinic,
     404: MessageOut,
-    403: MessageOut,
 })
 def one_pet(request, id: UUID4):
     user = get_object_or_404(User, id = request.auth['pk'])
     if user.account_type == "member":
         pet = get_object_or_404(Pet, id=id, owner__user_id=request.auth['pk'])
         return pet
-    return 403 , {"message": "not authorized to use endpoint"}
+    if user.account_type == "clinic":
+        clinic = get_object_or_404(Clinic, user_id = user.id)
+        print("pet")
+        pet = get_object_or_404(Pet, id = id, clinic = clinic)
+        vaccine = Vaccine.objects.filter(pet_id = pet.id, clinic_id= clinic.id).values()
+        report = Report.objects.filter(pet_id = pet.id , clinic_id= clinic.id).values()
+        return 201, {
+            "pet": pet,
+            "vaccine": list(vaccine),
+            "report": list(report),
+        }
+@pet_controller.get("one_pet_clinic",auth=AuthBearer(), deprecated=True, response={
+    200: PetOutClinic,
+    400: MessageOut,
+})
+def one_pet_clinic(request, pet_id: UUID4):
+    clinic = get_object_or_404(Clinic, user_id=request.auth['pk'])
+    pet = get_object_or_404(Pet, id=pet_id, clinic=clinic)
+    vaccine = Vaccine.objects.filter(pet_id=pet.id, clinic_id=clinic.id).values()
+    report = Report.objects.filter(pet_id=pet.id, clinic_id=clinic.id).values()
+    return  {
+        "pet": pet,
+        "vaccine": list(vaccine),
+        "report": list(report),
+    }
 @pet_controller.put('update_pet', auth= AuthBearer(), response= {
     200: MessageOut,
     400: MessageOut
