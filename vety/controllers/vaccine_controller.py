@@ -31,14 +31,38 @@ def all_pet_vaccine(request, pet_id:UUID4):
     200: VaccineOut,
     404: MessageOut
 })
-def one_pet_vaccine(request, pet_id:UUID4, clinic_id: UUID4):
-    vaccine = Vaccine.objects.filter(pet= pet_id, clinic = clinic_id )
+def one_pet_vaccine(request, vaccine_id):
+    user = get_object_or_404(Member, user_id = request.auth['pk'])
+    vaccine = Vaccine.objects.filter(id = vaccine_id)
     if vaccine:
         return vaccine
     return 404, {"message": "this pet doesn't have any vaccines"}
 
+@vaccine_clinic_controller.get('all_clinic_vaccine', auth = AuthBearer(), response= {
+    200: List[VaccineClinicOut],
+    404: MessageOut
+})
+def all_clinic_vaccine(request):
+    clinic = get_object_or_404(Clinic, user_id = request.auth['pk'])
+    vaccine = Vaccine.objects.filter(clinic = clinic)
+    if vaccine:
+        return vaccine
+    return 404, {"message": "clinic doesn't have vaccines"}
+
+@vaccine_clinic_controller.get('one_clinic_vaccine', auth = AuthBearer(), response= {
+    200: VaccineClinicOut,
+    404: MessageOut
+})
+def one_clinic_vaccine(request, vaccine_id: UUID4):
+    clinic = get_object_or_404(Clinic, user_id = request.auth['pk'])
+    pet = get_object_or_404(Pet, clinic = clinic)
+    vaccine = get_object_or_404(Vaccine,clinic = clinic, id = vaccine_id)
+    if vaccine:
+        return vaccine
+    return 404, {"message": "clinic don't have vaccine with that pet "}
+
 @vaccine_clinic_controller.post("create_vaccine", auth=AuthBearer(),response= {
-    201: VaccineOut,
+    201: VaccineClinicOut,
     400: MessageOut,
 })
 def create_vaccine(request, payload: VaccineIn):
@@ -51,7 +75,7 @@ def create_vaccine(request, payload: VaccineIn):
     return 400, {"message": "bad request"}
 
 @vaccine_clinic_controller.put("update_vaccine", auth=AuthBearer(), response= {
-    201: VaccineOut,
+    201: VaccineClinicOut,
     404: MessageOut,
 })
 def update_vaccine(request, payload: VaccineUpdate):

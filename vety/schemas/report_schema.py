@@ -14,6 +14,7 @@ from config.utils.schemas import Entity
 from config.utils.schemas import Token
 from account.models import EmailAccount
 from vety.models import Member
+from vety.schemas.pet_schema import PetNoClinic
 
 class ReportSchema(Schema):
     title: str
@@ -22,7 +23,13 @@ class ReportSchema(Schema):
 
 class ReportIn(ReportSchema):
     pet: UUID4
-    clinic: UUID4
+
+class ReportUpdate(Schema):
+    report_update: ReportIn
+    report_id: UUID4
 
 class ReportOut(Entity, ReportSchema):
     clinic: ClinicSchema
+
+class ReportClinicOut(Entity,ReportSchema):
+    pet: PetNoClinic

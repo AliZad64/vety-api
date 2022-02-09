@@ -15,20 +15,7 @@ from config.utils.schemas import Token
 from account.models import EmailAccount
 from vety.models import Member
 from vety.schemas.pet_schema import PetUserOut
-class VaccineSchema(Schema):
-    name: str
-    company: str
-    next: date = None
-
-class VaccineIn(VaccineSchema):
-    pet: UUID4
-
-class VaccineUpdate(Schema):
-    vaccine_update: VaccineIn
-    vaccine_id: UUID4
-
-class VaccineOut(Entity, VaccineSchema):
-    clinic: ClinicSchema
-
-class VaccineClinicOut(Entity,VaccineSchema):
-    pet: PetUserOut
+from vety.schemas.blog_schema import BlogOut
+class HomeSchema(Schema):
+    clinic: List[ClinicSchema]
+    blog: List[BlogOut]
