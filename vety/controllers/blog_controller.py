@@ -59,3 +59,11 @@ def delete_blog(request, id: UUID4):
 @blog_controller.get("filter_by_type", response= List[BlogOut])
 def filter_by_type(request, id: UUID4):
     return Blog.objects.filter(type = id)
+
+@blog_controller.get("all_clinic_blog",auth=AuthBearer(), response= {
+    200: ClinicBlogs,
+    404: MessageOut,
+})
+def all_clinic_blog(request):
+    clinic = get_object_or_404(Clinic, user_id = request.auth['pk'])
+    return clinic

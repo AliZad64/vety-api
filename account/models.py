@@ -8,7 +8,8 @@ from django.contrib.auth import authenticate
 from config.utils.models import Entity
 from django.core.validators import RegexValidator, ValidationError
 from django.db.models import CheckConstraint, Q, F
-
+from safedelete.models import SafeDeleteModel
+from safedelete.models import HARD_DELETE_NOCASCADE, SOFT_DELETE
 def number_valid(val):
     if re.match(r'^([\s\d]+)$',val):
         raise  ValidationError('only digit numbers')

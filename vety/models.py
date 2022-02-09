@@ -5,7 +5,9 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.core.validators import RegexValidator
 from django.db.models import Count
 from config.utils.models import Entity, CustomDateTimeField
-
+from safedelete.models import SafeDeleteModel
+from safedelete.models import SOFT_DELETE_CASCADE,HARD_DELETE_NOCASCADE, SOFT_DELETE
+from ckeditor.fields import RichTextField
 
 User = get_user_model()
 
@@ -13,10 +15,9 @@ User = get_user_model()
 
 
 # Member and Clinic type of models linked with the django user table
-class Member(models.Model):
+class Member(Entity):
     male = "male"
     female = "female"
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="memberss")
     gender = models.CharField('gender', max_length=255, null = True, blank=True, choices=[
         (male, male),
@@ -31,8 +32,7 @@ class Member(models.Model):
     def __str__(self):
         return self.user.phone_number
 
-class Clinic(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+class Clinic(Entity):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name= "clinicss")
     clinic_name = models.CharField('name',max_length=255,unique=True)
     facebook = models.URLField('facebook', max_length=500, null=True, blank=True)
@@ -54,8 +54,8 @@ class Clinic(models.Model):
 
 class Blog(Entity):
     title = models.CharField('title', max_length=255)
-    description = models.TextField('description')
-    image = models.ImageField('image', upload_to = "blogs/", null = True , blank = True)
+    description = RichTextField('description')
+    image = models.ImageField('image', upload_to = "blogs/")
     owner = models.ForeignKey(Clinic, related_name="fromClinic", on_delete=models.CASCADE)
     type = models.ForeignKey('PetType', related_name= "fromPet", null = True , blank = True, on_delete= models.SET_NULL)
 
@@ -90,13 +90,13 @@ class Pet(Entity):
     male = "male"
     female = "female"
     name = models.CharField('name', max_length=255)
-    owner = models.ForeignKey(Member, on_delete=models.SET_NULL, blank=True, null=True, related_name= "pet_owner")
+    owner = models.ForeignKey(Member, on_delete=models.SET_NULL, blank=True, null=True , related_name= "pet_owner")
     gender = models.CharField('gender', max_length=255, null = True, blank=True, choices=[
         (male, male),
         (female, female),
     ])
     image = models.ImageField('image', blank=True , null=True, upload_to="pets/")
-    type = models.ForeignKey(PetType, on_delete=models.SET_NULL,blank=True, null=True, related_name="pet_type")
+    type = models.ForeignKey(PetType, on_delete=models.CASCADE, related_name="pet_type")
     family = models.CharField('family', max_length=255, blank=True , null= True)
     weight = models.IntegerField('weight', blank=True , null=True)
     adopt_date = models.DateField('birth', blank=True, null=True)
@@ -159,7 +159,7 @@ class Vaccine(Entity):
     name = models.CharField('name', max_length=255)
     company = models.CharField('company', max_length=255)
     next = models.DateField('next', null=True, blank=True)
-    pet = models.ForeignKey(Pet, on_delete=models.SET_NULL, blank=True , null=True, related_name="petss_vaccine")
+    pet = models.ForeignKey(Pet, on_delete=models.CASCADE, related_name="petss_vaccine")
     clinic = models.ForeignKey(Clinic, on_delete=models.CASCADE, related_name = "clinics_vaccine")
 
     class Meta():
@@ -172,8 +172,8 @@ class Vaccine(Entity):
 class Report(Entity):
     title = models.CharField('title', max_length=255)
     allergy = models.CharField('allergy', max_length=255)
-    description = models.CharField('description', max_length=255)
-    pet = models.ForeignKey(Pet, on_delete=models.SET_NULL, blank=True , null=True, related_name="petss_report")
+    description = RichTextField('description')
+    pet = models.ForeignKey(Pet, on_delete=models.CASCADE, related_name="petss_report")
     clinic = models.ForeignKey(Clinic, on_delete=models.CASCADE, related_name="clinicss_report")
 
     class Meta():
@@ -196,8 +196,8 @@ class Doctor(Entity):
         return self.name
 
 class Appointment(Entity):
-    clinic = models.ForeignKey(Clinic, on_delete=models.SET_NULL, blank=True , null=True, related_name="clinicss_appointment")
-    member = models.ForeignKey(Member, on_delete=models.SET_NULL, blank=True , null=True, related_name="memberss_appointment")
+    clinic = models.ForeignKey(Clinic, on_delete=models.CASCADE, related_name="clinicss_appointment")
+    member = models.ForeignKey(Member, on_delete=models.CASCADE, related_name="memberss_appointment")
     start_date = CustomDateTimeField()
     end_date = CustomDateTimeField()
 

@@ -43,7 +43,6 @@ class SignUpOut(Entity):
     email: EmailStr = None
     phone_number: str
     address: AddressOut = None
-    area: str = None
     account_type: str
     user_image: str = None
     deleted_at: bool = None
@@ -151,8 +150,8 @@ class MemberUpdate(Schema):
     gender: str = None
     birth: date = None
 
-    @validator('gender')
-    def right_gender(cls,v):
+    @validator('gender', allow_reuse=True)
+    def right_member_gender(cls,v):
         if v:
             if v  != "male" and v != "female":
                 raise ValueError("choose the right gender")
@@ -166,7 +165,12 @@ class MemberUpdateOut(MemberSchema):
 
 
 # test user schema
+class testClinicFullInfo(ClinicSchema):
+    appointment: List[AppointmentClinicSchema] = Field(None, alias= "clinicss_appointment")
 class testUserSchemaOut(SignUpOut):
-    member: MemberSchema2 = Field(None, alias = "memberss")
-    appointment: List[AppointmentMemberSchema] = Field(None, alias= "memberss_appointment")
+    member: MemberSchema = Field(None, alias = "memberss")
+    clinic: testClinicFullInfo = Field(None, alias= "clinicss")
 
+class testUserOut(Schema):
+    profile: testUserSchemaOut
+    token: Token

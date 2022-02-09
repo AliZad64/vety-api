@@ -1,4 +1,4 @@
-from account.schemas.old_user_schema import SignUpOut
+from account.schemas.user_schema import SignUpOut
 from pydantic import UUID4
 from typing import List
 from datetime import date
@@ -26,3 +26,7 @@ class DislikeSchema(Schema):
 
 class DislikeSchemaIn(Schema):
     blog: UUID4
+
+class BlogRatingSchema(Schema):
+    like: LikeSchema = None
+    dislike: DislikeSchema = None

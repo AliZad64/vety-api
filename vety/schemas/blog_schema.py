@@ -37,3 +37,11 @@ class BlogUpdate(BlogSchema):
 
 class BlogSortById(Schema):
     type: UUID4
+
+class BlogNoOwner(Entity,BlogSchema):
+    type: PetTypeSchema
+    like_count: int = None
+    dislike_count: int = None
+
+class ClinicBlogs(ClinicSchema):
+    blog: BlogNoOwner = Field(None, alias="fromClinic")

@@ -58,8 +58,7 @@ def signup(request, account_in: SignUpIn):
 
 
 @account_controller.post('sign_in', response={
-    201: ClinicOut,
-    200: MemberOut,
+    200: testUserOut,
     404: MessageOut,
     400: MessageOut,
 })
@@ -82,9 +81,14 @@ def sign_in(request, signin_in: SigninIn):
         if not check_password(signin_in.password, user.password):
             return 404, {'message': 'wrong password'}
     token = create_token(user)
+    login = get_object_or_404(User, id = user.id)
+    return 200, {
+        'profile': login,
+        'token': token,
+    }
     if user.account_type == "member":
         return {
-            'profile': get_object_or_404(Member,user_id = user.id),
+            'profile': user,
             'token': token,
         }
     if user.account_type == "clinic":
@@ -95,18 +99,11 @@ def sign_in(request, signin_in: SigninIn):
 
 
 @account_controller.get('me', auth=AuthBearer(), response={
-    200: MemberSchema,
-    201: ClinicFullInfo,
+    200: testUserSchemaOut
 })
 def me(request):
-
     user =  get_object_or_404(User, id=request.auth['pk'])
-    if user.account_type == "member":
-        return  get_object_or_404(Member,user = user)
-
-    if user.account_type == "clinic":
-        return 201, get_object_or_404(Clinic, user_id=user.id)
-
+    return user
 
 @account_controller.put('update_account', auth=AuthBearer(), response={
     200: MemberUpdateOut,
@@ -119,7 +116,7 @@ def update_account(request, update_in: MemberUpdateIn):
     return get_object_or_404(Member, user_id=request.auth['pk'])
 
 @account_controller.delete("delete_account", auth=AuthBearer(),response= {
-    204: MessageOut,
+    200: MessageOut,
 })
 def delete_account(request):
     member = get_object_or_404(Member, user_id = request.auth['pk'])

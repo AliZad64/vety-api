@@ -23,5 +23,9 @@ class VaccineSchema(Schema):
 class VaccineIn(VaccineSchema):
     pet: UUID4
 
+class VaccineUpdate(Schema):
+    vaccine_update: VaccineIn
+    vaccine_id: UUID4
+
 class VaccineOut(Entity, VaccineSchema):
     clinic: ClinicSchema
