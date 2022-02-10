@@ -24,13 +24,12 @@ def rate_clinic(request, payload:RateClinicSchemaIn):
         rating = RateClinic.objects.get(member = user, clinic = clinic, point = payload.point)
         return 400, {"message": "user already rated the clinic with that number"}
     except:
-        try:
-            rating = RateClinic.objects.get(member= user, clinic = clinic)
-            rating.objects.update(member = user, clinic= clinic,point = payload.point)
+        rating = RateClinic.objects.filter(member= user, clinic = clinic)
+        if rating:
+            rating.update(**payload.dict())
             return 201, {"message": "updated your rating successfully"}
-        except:
-            rating = RateClinic.objects.create(member = user , clinic= clinic, point = payload.point)
-            return 201, {"message": "your rating has been saved"}
+        rating = RateClinic.objects.create(member = user , clinic= clinic, point = payload.point)
+        return 201, {"message": "your rating has been saved"}
 
 @clinic_rating_controller.get("one_clinic_rate",auth=AuthBearer(), response= {
     200: RateClinicSchemaOut

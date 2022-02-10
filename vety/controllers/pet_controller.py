@@ -68,14 +68,15 @@ def one_pet_clinic(request, pet_id: UUID4):
         "report": list(report),
     }
 @pet_controller.put('update_pet', auth= AuthBearer(), response= {
-    200: MessageOut,
+    200: PetOut,
     400: MessageOut
 })
 def update_pet(request, payload: PetUpdate):
     pet_type = get_object_or_404(PetType, id=payload.type)
     pet = Pet.objects.filter(id = payload.pet_id, owner__user_id= request.auth['pk']).update(**payload.pet_info.dict(), type_id= pet_type)
     if pet:
-        return 200, {"message": "updated"}
+        pet = Pet.objects.get(id = payload.pet_id)
+        return 200, pet
     return 400, {"message":"bad request"}
 
 @pet_controller.post('post_clinic_pet', auth=AuthBearer(), response= {
