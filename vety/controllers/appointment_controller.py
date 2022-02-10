@@ -11,7 +11,7 @@ from account.schemas.old_user_schema import *
 from vety.models import Member, Clinic, PetType, Pet, RateClinic, Blog, LikeBlog , DislikeBlog, Appointment
 from vety.schemas.pet_schema import *
 from vety.schemas.appointment_schema import *
-from datetime import datetime,timedelta
+from datetime import datetime,timedelta , date
 appointment_controller = Router(tags=["appointment"])
 
 @appointment_controller.post("create_appointment", auth=AuthBearer(), response= {
@@ -20,11 +20,12 @@ appointment_controller = Router(tags=["appointment"])
 })
 def create_appointment(request, payload:AppointmentSchemaIn):
     #get the date without seconds
-    start_date = payload.start_date.strftime('%Y-%m-%d %H:%M')
+    start_date = payload.start_date.replace(minute=00).strftime('%Y-%m-%d %H:%M')
     #get the time only for validate
     start_time = payload.start_date.strftime("%H:%M")
-    end_date = payload.start_date + timedelta(hours=1)
-    end_time = end_date.strftime("%H:%M")
+    end_date_update = payload.start_date.replace(minute= 00) + timedelta(hours=1)
+    end_date = end_date_update.strftime('%Y-%m-%d %H:%M')
+    end_time = end_date_update.strftime("%H:%M")
     print(start_time)
     print(end_time)
     member = get_object_or_404(Member, user_id = request.auth['pk'])

@@ -44,3 +44,5 @@ def delete_clinic_rate(request, clinic_id: UUID4):
     rating = get_object_or_404(RateClinic,member__user_id = request.auth['pk'], clinic = clinic_id )
     rating.delete()
     return 201, {"message": "deleted successfully "}
+
+
