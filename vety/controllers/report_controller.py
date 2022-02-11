@@ -79,7 +79,7 @@ def create_report(request, payload:ReportIn):
     201: ReportClinicOut,
     404: MessageOut,
 })
-def update_report(request, payload:ReportIn):
+def update_report(request, payload:ReportUpdate):
     clinic = get_object_or_404(Clinic, user_id = request.auth['pk'])
     report = Report.objects.filter(id = payload.report_id, clinic = clinic)
     if report:

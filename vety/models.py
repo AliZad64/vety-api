@@ -186,7 +186,8 @@ class Report(Entity):
 class Doctor(Entity):
     name = models.CharField('name', max_length=255)
     phone_number = models.CharField('phone_number', max_length=255, validators= [RegexValidator(r'^([\s\d]+)$', 'Only digits characters')])
-    clinic = models.ForeignKey(Clinic,on_delete=models.CASCADE)
+    image = models.ImageField('image', upload_to="doctor/", null=True , blank=True)
+    clinic = models.ForeignKey(Clinic,on_delete=models.CASCADE, related_name="clinicss_doctor")
 
     class Meta():
         verbose_name_plural = "الاطباء"

@@ -95,7 +95,7 @@ class ClinicInfo(ClinicSchema):
 
 class ClinicFullInfo(ClinicInfo):
     appointment: List[AppointmentClinicSchema] = Field(None, alias= "clinicss_appointment")
-
+    doctor: List[DoctorSchema] = Field(None, alias= "clinicss_doctor")
 class ClinicOut(Schema):
     profile: ClinicInfo
     token: Token
