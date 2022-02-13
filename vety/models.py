@@ -32,6 +32,11 @@ class Member(Entity):
     def __str__(self):
         return self.user.phone_number
 
+
+
+
+
+
 class Clinic(Entity):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name= "clinicss")
     clinic_name = models.CharField('name',max_length=255,unique=True)
@@ -74,6 +79,9 @@ class Blog(Entity):
     def __str__(self):
         return self.title
 
+    def clinic_info(self):
+        return self.owner.clinic_name
+
 #-------pet related models--------
 class PetType(Entity):
     name = models.CharField('title', max_length=255)
@@ -110,7 +118,8 @@ class Pet(Entity):
 
     def __str__(self):
         return self.name
-
+    def user_info(self):
+        return self.owner.user.phone_number + "-" + self.owner.user.first_name + self.owner.user.last_name
 
 class LikeBlog(Entity):
     blog = models.ForeignKey('blog',on_delete=models.CASCADE, related_name="blogss_rating_like")
@@ -168,7 +177,8 @@ class Vaccine(Entity):
 
     def __str__(self):
         return self.name
-
+    def member_info(self):
+        return self.pet.owner.user.phone_number
 class Report(Entity):
     title = models.CharField('title', max_length=255)
     allergy = models.CharField('allergy', max_length=255)
@@ -182,7 +192,8 @@ class Report(Entity):
 
     def __str__(self):
         return self.title
-
+    def member_info(self):
+        return self.pet.owner.user.phone_number
 class Doctor(Entity):
     name = models.CharField('name', max_length=255)
     phone_number = models.CharField('phone_number', max_length=255, validators= [RegexValidator(r'^([\s\d]+)$', 'Only digits characters')])
