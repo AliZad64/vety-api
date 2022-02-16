@@ -29,7 +29,7 @@ def create_blog(request, payload:BlogIn):
         return 201 , BlogOut
     return 400, {"message": "bad request"}
 
-@blog_controller.get("all_blog", response=List[BlogOut])
+@blog_controller.get("all_blog", response=List[AllBlogOut])
 def all_blog(request):
     return Blog.objects.all()
 
@@ -51,8 +51,8 @@ def one_blog(request, id:UUID4):
     400: MessageOut
 })
 def delete_blog(request, id: UUID4):
-    user = get_object_or_404(Clinic, user_id = request.auth['pk'])
-    blog = get_object_or_404(Blog, id=id ,owner_id = user.id, )
+    user = get_object_or_404(User, id = request.auth['pk'])
+    blog = get_object_or_404(Blog, id=id ,owner= user, )
     blog.delete()
     return 200, {"message": "deleted successfully"}
 

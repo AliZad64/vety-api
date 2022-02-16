@@ -50,6 +50,7 @@ class SignUpOut(Entity):
 
 
 
+
 #------user signin-----
 
 class SigninIn(Schema, BaseModel):
@@ -80,7 +81,11 @@ class AppointmentClinicSchema(Entity):
     start_date: datetime
     end_date: datetime
     member: MemberClinicSchema = None
-
+#this is for clinics location and names info when they are connected with clinic schema
+class ClinicSign(Schema):
+    first_name: str
+    last_name: str
+    address : AddressOut = None
 class ClinicSchema(Entity):
     clinic_name: str
     facebook: str = None
@@ -88,14 +93,30 @@ class ClinicSchema(Entity):
     start_date: time = None
     end_date: time = None
     rating_average: int = None
-
+    user: ClinicSign
+# this is for full info blog
+class SpecialClinicSchema(Entity):
+    clinic_name: str
+    facebook: str = None
+    instagram: str = None
+    start_date: time = None
+    end_date: time = None
+    rating_average: int = None
+# these 2 blog classes are just blog schemas to show few info and not many info
+class ClinicBlogSchema(Entity):
+    clinic_name: str
+    rating_average: int= None
+class ClinicBlogSchemaOut(Entity, ClinicSign):
+    clinic: ClinicBlogSchema = Field(None, alias="clinicss")
+class ClinicSignOut(Entity, ClinicSign):
+    clinic: SpecialClinicSchema = Field(None, alias="clinicss")
 
 class ClinicInfo(ClinicSchema):
     user: SigninOut
 
 class ClinicFullInfo(ClinicInfo):
     appointment: List[AppointmentClinicSchema] = Field(None, alias= "clinicss_appointment")
-    doctor: List[DoctorSchema] = Field(None, alias= "clinicss_doctor")
+
 class ClinicOut(Schema):
     profile: ClinicInfo
     token: Token
@@ -174,3 +195,6 @@ class testUserSchemaOut(SignUpOut):
 class testUserOut(Schema):
     profile: testUserSchemaOut
     token: Token
+
+class ImageUpdate(Schema):
+    first_name: UploadedFile = File(...)

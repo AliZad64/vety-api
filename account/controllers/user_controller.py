@@ -81,20 +81,11 @@ def sign_in(request, signin_in: SigninIn):
         if not check_password(signin_in.password, user.password):
             return 404, {'message': 'wrong password'}
     token = create_token(user)
+    login = get_object_or_404(User, id = user.id)
     return 200, {
-        'profile': user,
+        'profile': login,
         'token': token,
     }
-    if user.account_type == "member":
-        return {
-            'profile': user,
-            'token': token,
-        }
-    if user.account_type == "clinic":
-        return 201, {
-            'profile': get_object_or_404(Clinic, user_id=user.id),
-            'token': token,
-        }
 
 
 @account_controller.get('me', auth=AuthBearer(), response={
@@ -113,6 +104,7 @@ def update_account(request, update_in: MemberUpdateIn):
     Member.objects.filter(user=request.auth['pk']).update(**update_in.member.dict())
     # .update(gender = update_in.gender)
     return get_object_or_404(Member, user_id=request.auth['pk'])
+
 
 @account_controller.delete("delete_account", auth=AuthBearer(),response= {
     200: MessageOut,
@@ -172,14 +164,10 @@ def one_clinic(request, id: UUID4):
 
 
 @address_controller.get('all_address',response={
-    200: List[AddressOut],
-    404: MessageOut
+    200: List[AddressOut]
 })
 def all_address(request):
-    address= Address.objects.all()
-    if address:
-        return address
-    return 404 , {"message": "there are no addresses"}
+    return Address.objects.all()
 
 
 # @account_controller.post('change-password', auth=AuthBearer(), response={
