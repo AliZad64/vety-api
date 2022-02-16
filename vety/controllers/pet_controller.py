@@ -51,7 +51,7 @@ def one_pet(request, pet_id: UUID4):
     if member:
         pet = get_object_or_404(Pet, id=pet_id, owner__user_id=request.auth['pk'])
         return pet
-    return 404, {"member not found"}
+    return 404, {"message": "member not found"}
 
 @pet_controller.get("one_pet_clinic",auth=AuthBearer(),  response={
     200: PetOutClinic,
@@ -94,10 +94,10 @@ def post_clinic_pet(request, id: UUID4, clinic_id: UUID4):
     return 400, {'message': 'bad request'}
 
 @pet_controller.delete("delete_pet", auth=AuthBearer(), response= {
-    200: MessageOut
+    204: MessageOut
 })
 def delete_pet(request, pet_id: UUID4):
     member = get_object_or_404(Member,user_id = request.auth['pk'])
     pet = get_object_or_404(Pet,owner__user_id = request.auth['pk'], id = pet_id)
     pet.delete()
-    return {"message": "deleted successfully"}
+    return 204, {"message": "deleted successfully"}

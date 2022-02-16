@@ -15,7 +15,8 @@ User = get_user_model()
 
 
 # Member and Clinic type of models linked with the django user table
-class Member(Entity):
+class Member(Entity, SafeDeleteModel):
+    _safedelete_policy = HARD_DELETE_NOCASCADE
     male = "male"
     female = "female"
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="memberss")
@@ -54,9 +55,9 @@ class Clinic(Entity):
 
 class Blog(Entity):
     title = models.CharField('title', max_length=255)
-    description = RichTextField('description')
+    description = models.TextField('description')
     image = models.ImageField('image', upload_to = "blogs/")
-    owner = models.ForeignKey(Clinic, related_name="fromClinic", on_delete=models.CASCADE)
+    owner = models.ForeignKey(User, related_name="fromClinic", on_delete=models.CASCADE)
     type = models.ForeignKey('PetType', related_name= "fromPet", null = True , blank = True, on_delete= models.SET_NULL)
 
     class Meta():
@@ -86,11 +87,12 @@ class PetType(Entity):
         return self.name
 
 
-class Pet(Entity):
+class Pet(Entity, SafeDeleteModel):
+    _safedelete_policy = HARD_DELETE_NOCASCADE
     male = "male"
     female = "female"
     name = models.CharField('name', max_length=255)
-    owner = models.ForeignKey(Member, on_delete=models.SET_NULL, blank=True, null=True , related_name= "pet_owner")
+    owner = models.ForeignKey(Member, on_delete=models.CASCADE, related_name= "pet_owner")
     gender = models.CharField('gender', max_length=255, null = True, blank=True, choices=[
         (male, male),
         (female, female),
@@ -102,7 +104,7 @@ class Pet(Entity):
     adopt_date = models.DateField('birth', blank=True, null=True)
     age = models.IntegerField('age', blank=True , null=True)
     chip_num = models.CharField('chip_number', max_length=255, blank=True , null=True)
-    clinic = models.ManyToManyField(Clinic , related_name='pet_clinic')
+    clinic = models.ManyToManyField(Clinic ,blank=True , null=True, related_name='pet_clinic')
 
     class Meta():
         verbose_name_plural = "حيوانات الاليفة"
@@ -172,7 +174,7 @@ class Vaccine(Entity):
 class Report(Entity):
     title = models.CharField('title', max_length=255)
     allergy = models.CharField('allergy', max_length=255)
-    description = RichTextField('description')
+    description = models.TextField('description')
     pet = models.ForeignKey(Pet, on_delete=models.CASCADE, related_name="petss_report")
     clinic = models.ForeignKey(Clinic, on_delete=models.CASCADE, related_name="clinicss_report")
 

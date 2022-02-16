@@ -86,16 +86,6 @@ def sign_in(request, signin_in: SigninIn):
         'profile': login,
         'token': token,
     }
-    if user.account_type == "member":
-        return {
-            'profile': user,
-            'token': token,
-        }
-    if user.account_type == "clinic":
-        return 201, {
-            'profile': get_object_or_404(Clinic, user_id=user.id),
-            'token': token,
-        }
 
 
 @account_controller.get('me', auth=AuthBearer(), response={
@@ -115,6 +105,12 @@ def update_account(request, update_in: MemberUpdateIn):
     # .update(gender = update_in.gender)
     return get_object_or_404(Member, user_id=request.auth['pk'])
 
+@account_controller.post('update_image', response= {
+    201: testUserSchemaOut
+})
+def update_image(request, payload: UploadedFile = File(...)):
+    User.objects.filter(phone_number = "07787654321").update(user_image = payload)
+    return 201, get_object_or_404(User, phone_number = "07787654321")
 @account_controller.delete("delete_account", auth=AuthBearer(),response= {
     200: MessageOut,
 })

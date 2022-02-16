@@ -24,8 +24,13 @@ class BlogSchema(Schema):
 class BlogIn(BlogSchema):
     type_id: UUID4
 
+class AllBlogOut(Entity, BlogSchema):
+    owner: ClinicBlogSchemaOut
+    type: PetTypeSchema
+    like_count: int = None
+    dislike_count: int = None
 class BlogOut(Entity, BlogSchema):
-    owner: ClinicSchema
+    owner: ClinicSignOut
     type: PetTypeSchema
     like_count: int = None
     dislike_count: int = None

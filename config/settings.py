@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'vety',
     'account',
+    'django_seed',
 ]
 
 MIDDLEWARE = [
