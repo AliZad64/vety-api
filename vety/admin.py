@@ -27,7 +27,7 @@ class ClinicAdmin(admin.ModelAdmin):
 
 class BlogAdmin(admin.ModelAdmin):
     date_hierarchy = 'created'
-    list_display = ( 'title','image_show','type', 'clinic_info' , 'like_count', 'dislike_count')
+    list_display = ( 'title','image_show','type' , 'like_count', 'dislike_count')
     list_filter = ('type', 'owner')
     search_fields = ('title',)
     readonly_fields = ['image_show']
@@ -42,7 +42,7 @@ class BlogAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         user = request.user
-        return qs if user.is_superuser else Blog.objects.filter(owner__user_id = user.id)
+        return qs if user.is_superuser else Blog.objects.filter(owner_id = user.id)
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if not request.user.is_superuser:
@@ -104,7 +104,7 @@ class ContactAdmin(admin.ModelAdmin):
     readonly_fields = ['question']
 
 class VaccineAdmin(admin.ModelAdmin):
-    list_display = ('name', 'company', 'next', 'pet', 'member_info')
+    list_display = ('name', 'company', 'next', 'pet')
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         user = request.user
@@ -132,7 +132,7 @@ class VaccineAdmin(admin.ModelAdmin):
 
 
 class ReportAdmin(admin.ModelAdmin):
-    list_display = ("title", "allergy", "description", "pet", "member_info")
+    list_display = ("title", "allergy", "description", "pet")
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
@@ -160,7 +160,7 @@ class ReportAdmin(admin.ModelAdmin):
         return request.user.is_superuser or request.user.groups.filter(name='clinic').exists()
 
 class DoctorAdmin(admin.ModelAdmin):
-    list_display = ("name", "phone_number", "image", "clinic")
+    list_display = ("name", "phone_number",  "clinic")
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         user = request.user
