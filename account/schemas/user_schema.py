@@ -71,6 +71,7 @@ class MemberForClinic(Entity):
     phone_number: str
 #doctor class
 class DoctorSchema(Entity):
+    image: str = None
     name: str
     phone_number: str
 #member class
@@ -111,12 +112,12 @@ class ClinicBlogSchemaOut(Entity, ClinicSign):
 class ClinicSignOut(Entity, ClinicSign):
     clinic: SpecialClinicSchema = Field(None, alias="clinicss")
 
-class ClinicInfo(ClinicSchema):
+class ClinicInfo(SpecialClinicSchema):
     user: SigninOut
 
 class ClinicFullInfo(ClinicInfo):
     appointment: List[AppointmentClinicSchema] = Field(None, alias= "clinicss_appointment")
-
+    doctor: List[DoctorSchema] = Field(None, alias = "clinicss_doctor")
 class ClinicOut(Schema):
     profile: ClinicInfo
     token: Token
@@ -198,3 +199,12 @@ class testUserOut(Schema):
 
 class ImageUpdate(Schema):
     first_name: UploadedFile = File(...)
+
+class UserUpdateForm(Schema):
+    first_name: str = None
+    last_name: str = None
+    address: UUID4 = None
+
+class MemberUpdateForm(Schema):
+    user: UserUpdateForm = None
+    member: MemberUpdate = None

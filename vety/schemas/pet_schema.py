@@ -31,18 +31,19 @@ class testClinicOut(Schema):
 #for vaccine and report schemas
 class NameClinicSchema(Entity):
     clinic_name: str = None
-class VaccineSchema(Schema):
+class VaccineSchema(Entity):
     name: str = None
     clinic: NameClinicSchema = None
     created: datetime = None
+    updated: datetime = None
 
-class ReportSchema(Schema):
+class ReportSchema(Entity):
     id: UUID4 = None
     title: str = None
     clinic: NameClinicSchema = None
     description: str = None
     created: datetime = None
-
+    updated: datetime = None
 #for clinic vaccine and clinic schema
 class PetSchemaForClinic(Entity):
     owner: MemberClinicSchema
@@ -73,7 +74,7 @@ class PetSchema(Schema):
     weight: int
     adopt_date: date
     age: int
-    chip_num: str = None
+    chip_num: str = Field(None, regex=r'^([\s\d]+)$')
 
     @validator('gender')
     def right_gender(cls, v):
@@ -118,4 +119,28 @@ class PetUserOut(PetSchema,Entity):
 class PetInClinic(Schema):
     pet: UUID4
     clinic: UUID4
+
+class PetFormSchema(Schema):
+    name: str
+    gender: str
+    family: str
+    weight: int
+    adopt_date: date
+    age: int
+    chip_num: str = Field(None, regex=r'^([\s\d]+)$')
+
+    @validator('gender', allow_reuse=True)
+    def right_gender(cls, v):
+        if v:
+            if v != "male" and v != "female":
+                raise ValueError("choose the right gender either male or female")
+        return v
+    @validator('weight')
+    def right_weight(cls,v):
+        if v:
+            if v <= 0:
+                raise ValueError("put real weight")
+        return v
+
+
 

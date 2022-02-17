@@ -105,6 +105,15 @@ def update_account(request, update_in: MemberUpdateIn):
     # .update(gender = update_in.gender)
     return get_object_or_404(Member, user_id=request.auth['pk'])
 
+@account_controller.post('update_account_form', auth=AuthBearer(), response={
+    200: MemberUpdateOut,
+
+})
+def update_account_form(request, update_in: MemberUpdateForm = Form(...) , user_image: UploadedFile = File(...)):
+    User.objects.filter(id=request.auth['pk']).update(**update_in.user.dict(), user_image = user_image)
+    Member.objects.filter(user=request.auth['pk']).update(**update_in.member.dict())
+    # .update(gender = update_in.gender)
+    return get_object_or_404(Member, user_id=request.auth['pk'])
 
 @account_controller.delete("delete_account", auth=AuthBearer(),response= {
     200: MessageOut,

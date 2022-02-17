@@ -30,3 +30,7 @@ class DislikeSchemaIn(Schema):
 class BlogRatingSchema(Schema):
     like: LikeSchema = None
     dislike: DislikeSchema = None
+
+class CheckRateBlogSchema(Schema):
+    is_like: bool = None
+    is_dislike: bool = None

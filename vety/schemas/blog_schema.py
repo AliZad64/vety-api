@@ -29,11 +29,13 @@ class AllBlogOut(Entity, BlogSchema):
     type: PetTypeSchema
     like_count: int = None
     dislike_count: int = None
+    created: datetime = None
 class BlogOut(Entity, BlogSchema):
     owner: ClinicSignOut
     type: PetTypeSchema
     like_count: int = None
     dislike_count: int = None
+    created: datetime = None
 class BlogUpdate(BlogSchema):
     title: str = None
     description :str = None

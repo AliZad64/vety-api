@@ -29,6 +29,8 @@ class VaccineUpdate(Schema):
 
 class VaccineOut(Entity, VaccineSchema):
     clinic: ClinicSchema
+    created: datetime = None
+    updated: datetime = None
 
 class VaccineClinicOut(Entity,VaccineSchema):
     pet: PetUserOut

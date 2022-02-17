@@ -35,7 +35,8 @@ def one_pet_vaccine(request, vaccine_id):
     user = get_object_or_404(Member, user_id = request.auth['pk'])
     vaccine = Vaccine.objects.filter(id = vaccine_id)
     if vaccine:
-        return vaccine
+        get_vaccine = Vaccine.objects.get(id = vaccine_id)
+        return get_vaccine
     return 404, {"message": "this pet doesn't have any vaccines"}
 
 @vaccine_clinic_controller.get('all_clinic_vaccine', auth = AuthBearer(), response= {

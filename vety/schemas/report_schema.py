@@ -30,6 +30,7 @@ class ReportUpdate(Schema):
 
 class ReportOut(Entity, ReportSchema):
     clinic: ClinicSchema
-
+    created: datetime = None
+    updated: datetime = None
 class ReportClinicOut(Entity,ReportSchema):
     pet: PetNoClinic

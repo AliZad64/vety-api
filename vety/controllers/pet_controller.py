@@ -68,14 +68,15 @@ def one_pet_clinic(request, pet_id: UUID4):
         "report": list(report),
     }
 @pet_controller.put('update_pet', auth= AuthBearer(), response= {
-    200: MessageOut,
+    200: SinglePet,
     400: MessageOut
 })
 def update_pet(request, payload: PetUpdate):
     pet_type = get_object_or_404(PetType, id=payload.type)
     pet = Pet.objects.filter(id = payload.pet_id, owner__user_id= request.auth['pk']).update(**payload.pet_info.dict(), type_id= pet_type)
     if pet:
-        return 200, {"message": "updated"}
+        update_pet = Pet.objects.get(id = payload.pet_id)
+        return 200, update_pet
     return 400, {"message":"bad request"}
 
 @pet_controller.post('post_clinic_pet', auth=AuthBearer(), response= {
@@ -101,3 +102,27 @@ def delete_pet(request, pet_id: UUID4):
     pet = get_object_or_404(Pet,owner__user_id = request.auth['pk'], id = pet_id)
     pet.delete()
     return 204, {"message": "deleted successfully"}
+
+@pet_controller.post('create_pet_form', auth=AuthBearer(), response= {
+    201: SinglePet,
+    400: MessageOut
+})
+def create_pet_form(request, type_id: UUID4 = Form(...), payload:PetFormSchema = Form(...),  image: UploadedFile = File(...)):
+    member = get_object_or_404(Member, user = request.auth['pk'])
+    pet_type = get_object_or_404(PetType, id = type_id)
+    new_pet = Pet.objects.create(**payload.dict(), owner= member, type= pet_type , image = image)
+    if new_pet:
+        return 201, new_pet
+    return 400, {'message': 'bad request'}
+
+@pet_controller.post('update_pet_form', auth= AuthBearer(), response= {
+    200: SinglePet,
+    400: MessageOut
+})
+def update_pet_form(request,pet_id:UUID4 = Form(...), type_id: UUID4 = Form(...), payload:PetFormSchema = Form(...),  image: UploadedFile = File(...)):
+    pet_type = get_object_or_404(PetType, id=type_id)
+    pet = Pet.objects.filter(id = pet_id, owner__user_id= request.auth['pk']).update(**payload.dict(), type_id= pet_type)
+    if pet:
+        update_pet = Pet.objects.get(id = pet_id)
+        return 200, update_pet
+    return 400, {"message":"bad request"}

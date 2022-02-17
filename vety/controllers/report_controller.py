@@ -34,7 +34,7 @@ def all_report(request, pet_id: UUID4):
 })
 def one_pet_report(request, report_id: UUID4):
     user = get_object_or_404(Member, user_id=request.auth['pk'])
-    report = Report.objects.get(id=report_id)
+    report = get_object_or_404(Report,id=report_id)
     if report:
         return report
     return 404, {"message": "this pet doesn't have any reports"}
