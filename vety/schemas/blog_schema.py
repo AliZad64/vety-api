@@ -36,6 +36,11 @@ class BlogOut(Entity, BlogSchema):
     like_count: int = None
     dislike_count: int = None
     created: datetime = None
+
+class UserBlogOut(BlogOut):
+    is_like: bool = None
+    is_dislike: bool = None
+
 class BlogUpdate(BlogSchema):
     title: str = None
     description :str = None
