@@ -31,7 +31,7 @@ def like_blog(request, blog_id: UUID4 ):
             dislike.delete()
         like = LikeBlog.objects.create(member=user , blog = blog , is_like= True)
         if like:
-            return 201, {"messaged": "liked the blog successfully"}
+            return 201, {"message": "liked the blog successfully"}
 
 
 @blog_rating_controller.post("dislike_blog", auth=AuthBearer(), response= {
