@@ -144,18 +144,18 @@ class PetUserOut(Entity):
 class MemberSchema(Schema):
     user: SigninOut
     gender:str = None
-    birth: date = None
     pet: List[PetUserOut] = Field(None, alias= "pet_owner")
     appointment: List[AppointmentMemberSchema] = Field(None, alias= "memberss_appointment")
 
 class MemberSchema2(Schema):
     gender:str = None
-    birth: date = None
     pet: List[PetUserOut] = Field(None, alias= "pet_owner")
+    appointment: List[AppointmentMemberSchema] = Field(None, alias= "memberss_appointment")
+
 class MemberNoPetSchema(Schema):
     user: SigninOut
     gender:str = None
-    birth: date = None
+
 
 class MemberOut(Schema):
     profile: MemberSchema
@@ -167,10 +167,9 @@ class UserUpdate(Schema):
     first_name: str = None
     last_name: str = None
     address: UUID4 = None
-    user_image: str = None
+
 class MemberUpdate(Schema):
     gender: str = None
-    birth: date = None
 
     @validator('gender', allow_reuse=True)
     def right_member_gender(cls,v):
@@ -190,7 +189,7 @@ class MemberUpdateOut(MemberSchema):
 class testClinicFullInfo(ClinicSchema):
     appointment: List[AppointmentClinicSchema] = Field(None, alias= "clinicss_appointment")
 class testUserSchemaOut(SignUpOut):
-    member: MemberSchema = Field(None, alias = "memberss")
+    member: MemberSchema2 = Field(None, alias = "memberss")
     clinic: testClinicFullInfo = Field(None, alias= "clinicss")
 
 class testUserOut(Schema):

@@ -104,7 +104,7 @@ class Pet(Entity, SafeDeleteModel):
     adopt_date = models.DateField('birth', blank=True, null=True)
     age = models.IntegerField('age', blank=True , null=True)
     chip_num = models.CharField('chip_number', max_length=255, blank=True , null=True)
-    clinic = models.ManyToManyField(Clinic ,blank=True , null=True, related_name='pet_clinic')
+    clinic = models.ManyToManyField(Clinic , related_name='pet_clinic')
 
     class Meta():
         verbose_name_plural = "حيوانات الاليفة"

@@ -105,7 +105,7 @@ def update_account(request, update_in: MemberUpdateIn):
     # .update(gender = update_in.gender)
     return get_object_or_404(Member, user_id=request.auth['pk'])
 
-@account_controller.post('update_account_form', auth=AuthBearer(), response={
+@account_controller.post('update_account_form', deprecated=True, auth=AuthBearer(), response={
     200: MemberUpdateOut,
 
 })
