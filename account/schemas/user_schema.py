@@ -209,5 +209,5 @@ class MemberUpdateForm(Schema):
     member: MemberUpdate = None
 
 
-class ClinicFullInfoAndRating(ClinicInfo):
+class ClinicFullInfoAndRating(ClinicFullInfo):
     user_rating: int = None
