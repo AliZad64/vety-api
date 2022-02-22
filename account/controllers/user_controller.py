@@ -164,7 +164,7 @@ def all_clinic(request):
     return Clinic.objects.all().exclude(clinic_name = "vety")
 
 
-@clinic_controller.get('one_clinics', response={
+@clinic_controller.get('one_clinics', auth =AuthBearer(), response={
     200: ClinicFullInfoAndRating
 })
 def one_clinic(request, id: UUID4):
@@ -172,6 +172,7 @@ def one_clinic(request, id: UUID4):
     try:
         rating = RateClinic.objects.get(member__user_id = request.auth['pk'], clinic = clinic )
         clinic.user_rating = rating.point
+        print('teesto')
         return clinic
     except:
         return clinic
