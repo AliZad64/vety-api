@@ -207,3 +207,7 @@ class UserUpdateForm(Schema):
 class MemberUpdateForm(Schema):
     user: UserUpdateForm = None
     member: MemberUpdate = None
+
+
+class ClinicFullInfoAndRating(ClinicInfo):
+    user_rating: int = None

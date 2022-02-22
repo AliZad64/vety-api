@@ -7,7 +7,7 @@ from config.utils.schemas import MessageOut
 from django.db.models import Q
 from ninja import Router, Form
 from account.schemas.user_schema import *
-from vety.models import Member, Clinic
+from vety.models import Member, Clinic, RateClinic
 from account.models import Address
 from email_validator import validate_email, EmailNotValidError
 
@@ -168,10 +168,13 @@ def all_clinic(request):
     200: ClinicFullInfo
 })
 def one_clinic(request, id: UUID4):
-    return get_object_or_404(Clinic, id= id)
-
-
-
+    clinic = get_object_or_404(Clinic, id= id)
+    try:
+        rating = RateClinic.objects.get(member__user_id = request.auth['pk'], clinic = clinic )
+        clinic.user_rating = rating.point
+        return clinic
+    except:
+        return clinic
 @address_controller.get('all_address',response={
     200: List[AddressOut]
 })
