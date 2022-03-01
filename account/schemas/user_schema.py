@@ -32,7 +32,7 @@ class SignUp(Schema):
     email: str = None
     password1: str = Field(min_length=8)
     password2: str = Field(min_length=8)
-    phone_number: str = Field(min_length=11, max_length=15 , regex=r'^07([\s\d]+)$')
+    phone_number: str = Field(min_length=11, max_length=11 , regex=r'^07([\s\d]+)$')
 
 class SignUpIn(SignUp):
     pass

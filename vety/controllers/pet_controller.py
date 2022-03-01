@@ -122,7 +122,11 @@ def create_pet_form(request, type_id: UUID4 = Form(...), payload:PetFormSchema =
 def update_pet_form(request,pet_id:UUID4 = Form(...), type_id: UUID4 = Form(...), payload:PetFormSchema = Form(...), image: UploadedFile = File(None)):
     pet_type = get_object_or_404(PetType, id=type_id)
     if image is not None:
-        pet = Pet.objects.filter(id = pet_id, owner__user_id= request.auth['pk']).update(**payload.dict(), type_id= pet_type, image = image)
+        pet = Pet.objects.filter(id = pet_id, owner__user_id= request.auth['pk']).update(**payload.dict(), type_id= pet_type)
+        pet = get_object_or_404(Pet, id = pet_id)
+        pet.image.delete()
+        pet.image = image
+        pet.save()
         if pet:
             update_pet = Pet.objects.get(id=pet_id)
             return 200, update_pet

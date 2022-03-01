@@ -111,7 +111,7 @@ class Pet(Entity, SafeDeleteModel):
         verbose_name = "حيوان اليف"
 
     def __str__(self):
-        return self.name
+        return self.name + " - " + self.owner.user.phone_number
 
 
 class LikeBlog(Entity):

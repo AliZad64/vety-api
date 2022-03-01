@@ -70,7 +70,7 @@ class EmailAccount(AbstractUser, Entity):
         verbose_name_plural = "المستخدمون"
         verbose_name = "المستخدم"
     def __str__(self):
-        return self.first_name + self.last_name + " - " + self.phone_number
+        return self.first_name + "  " + self.last_name + " - " + self.phone_number
 
     def has_perm(self, perm, obj=None):
         return self.is_superuser
